@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#04437F" />
+<title>¿Qué es ahí? — Bogotá</title>
+<meta name="description" content="¿Qué es ahí? / ¿What's there? — Exploración urbana geolocalizada: descubre qué hay cerca de ti en el centro histórico de Bogotá." />
+<link rel="icon" type="image/png" href="favicon.png" />
+<link rel="apple-touch-icon" href="logo.png" />
+
+<!-- Cartografía: Leaflet + OpenStreetMap (CDN) -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+/>
+
+<style>
+  /* ===========================================================
+     ¿Qué es ahí?  ·  v0.1  ·  página única autónoma
+     Sigue el espíritu de ARQUITECTURA_QUE_ES_AHI.md:
+       - Mobile-first
+       - Capas separadas (repositorio / servicios / presentación)
+       - Modelo de datos "Place" (sección 8)
+       - Leaflet + OpenStreetMap
+       - Botón "¿Qué es ahí?" con geolocalización
+     =========================================================== */
+
+  :root {
+    /* --- Paleta de marca "¿Qué es ahí?" (PDF Paleta de Colores y Logo) --- */
+    --brand-blue: #04437F;   /* azul principal — pin del logo, acciones */
+    --brand-blue-deep: #04305C;
+    --brand-red: #C74A2C;
+    --brand-orange: #E0951E;
+    --brand-green: #7C8B4A;
+    --brand-teal: #05707F;
+    --brand-indigo: #3C5393;
+
+    --bg: var(--brand-blue-deep);
+    --surface: #ffffff;
+    --surface-2: #eef2f6;
+    --text: #0f2036;
+    --text-soft: #4a5b70;
+    --line: #dde5ec;
+    --accent: var(--brand-blue);
+    --accent-ink: #ffffff;
+    --shadow: 0 10px 40px rgba(4, 48, 92, 0.28);
+    --radius: 18px;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  #app { position: fixed; inset: 0; display: flex; flex-direction: column; }
+
+  /* ---------- Encabezado ---------- */
+  header.topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 14px;
+    background: linear-gradient(180deg, rgba(4, 48, 92, 0.95) 0%, rgba(4, 48, 92, 0.78) 72%, rgba(4, 48, 92, 0) 100%);
+    color: #fff;
+    pointer-events: none;
+  }
+  header.topbar .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  header.topbar .brand img {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+  }
+  header.topbar h1 {
+    margin: 0;
+    font-size: 1.18rem;
+    line-height: 1.05;
+    letter-spacing: 0.2px;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+  header.topbar h1 .en {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #bcd4e8;
+  }
+  header.topbar h1 .tag {
+    font-size: 0.66rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 999px;
+    letter-spacing: 0.6px;
+  }
+  header.topbar p {
+    margin: 6px 0 0;
+    font-size: 0.8rem;
+    color: #dbe8f4;
+    text-shadow: 0 1px 4px rgba(4, 48, 92, 0.55);
+  }
+  /* Cinta con los cinco colores de acento de la paleta */
+  header.topbar .palette-strip {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+      var(--brand-red) 0 20%,
+      var(--brand-orange) 20% 40%,
+      var(--brand-green) 40% 60%,
+      var(--brand-teal) 60% 80%,
+      var(--brand-indigo) 80% 100%);
+    opacity: 0.9;
+  }
+
+  /* ---------- Mapa ---------- */
+  #map {
+    flex: 1;
+    width: 100%;
+    background: #aad3df;
+  }
+  .leaflet-container { font: inherit; }
+
+  /* Marcador del usuario */
+  .user-dot {
+    width: 18px; height: 18px;
+    background: var(--brand-blue);
+    border: 3px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(4, 67, 127, 0.35);
+  }
+
+  /* Marcador de lugar (color de acento por lugar) */
+  .poi-pin {
+    display: grid;
+    place-items: center;
+    width: 34px; height: 34px;
+    font-size: 18px;
+    background: var(--surface);
+    border: 2.5px solid var(--pin-color, var(--brand-blue));
+    border-radius: 50% 50% 50% 4px;
+    transform: rotate(45deg);
+    box-shadow: 0 4px 10px rgba(4, 48, 92, 0.35);
+  }
+  .poi-pin > span { transform: rotate(-45deg); }
+
+  /* ---------- Botón principal ---------- */
+  .cta-wrap {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: calc(18px + var(--safe-b));
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  button.cta {
+    pointer-events: auto;
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent-ink);
+    background: var(--accent);
+    padding: 15px 26px;
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.12s ease, background 0.12s ease;
+  }
+  button.cta:active { transform: scale(0.97); }
+  button.cta[disabled] { background: #94a3b8; cursor: progress; }
+  button.cta .spin {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Toast / errores ---------- */
+  .toast {
+    position: absolute;
+    left: 50%;
+    bottom: calc(88px + var(--safe-b));
+    transform: translateX(-50%) translateY(10px);
+    z-index: 1200;
+    max-width: min(92vw, 420px);
+    background: var(--brand-blue-deep);
+    color: #fff;
+    font-size: 0.86rem;
+    line-height: 1.4;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---------- Ficha de lugar (bottom sheet) ---------- */
+  .sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 1500;
+    background: rgba(4, 48, 92, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+  .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+
+  .sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 1600;
+    background: var(--surface);
+    border-radius: 22px 22px 0 0;
+    box-shadow: var(--shadow);
+    transform: translateY(102%);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    max-height: 88svh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: var(--safe-b);
+  }
+  .sheet.open { transform: translateY(0); }
+
+  .sheet .grabber {
+    width: 44px; height: 5px;
+    background: var(--line);
+    border-radius: 999px;
+    margin: 10px auto 4px;
+    flex: none;
+  }
+
+  .sheet .banner {
+    height: 118px;
+    flex: none;
+    --c: var(--brand-blue);
+    background: var(--c);
+    background:
+      linear-gradient(135deg, var(--c) 0%, color-mix(in srgb, var(--c) 62%, #000) 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 14px 20px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Cinta de acento de la paleta al pie del banner */
+  .sheet .banner::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+      var(--brand-red) 0 20%,
+      var(--brand-orange) 20% 40%,
+      var(--brand-green) 40% 60%,
+      var(--brand-teal) 60% 80%,
+      var(--brand-indigo) 80% 100%);
+  }
+  .sheet .banner .emoji {
+    position: absolute;
+    right: 14px; top: 8px;
+    font-size: 62px;
+    opacity: 0.4;
+    line-height: 1;
+  }
+  .sheet .banner h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    text-shadow: 0 1px 12px rgba(0,0,0,0.35);
+  }
+
+  .sheet .body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 20px 26px;
+  }
+
+  .sheet .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .chip {
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: var(--surface-2);
+    color: var(--text-soft);
+    padding: 4px 9px;
+    border-radius: 999px;
+  }
+  .chip.dist {
+    background: #e7eff7;
+    color: var(--brand-blue);
+  }
+
+  .sheet .summary {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 10px;
+  }
+  .sheet .location {
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    margin: 0 0 16px;
+  }
+
+  .sheet section.block { margin: 0 0 16px; }
+  .sheet section.block h3 {
+    margin: 0 0 5px;
+    font-size: 0.74rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--brand-teal);
+  }
+  .sheet section.block p {
+    margin: 0;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    color: var(--text);
+  }
+
+  .sheet .actions {
+    display: flex;
+    gap: 10px;
+    margin: 4px 0 16px;
+  }
+  .sheet .actions a {
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #fff;
+  }
+  .sheet .actions a.ghost {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .sheet .sources {
+    font-size: 0.74rem;
+    color: var(--text-soft);
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+  .sheet .sources strong { color: var(--text); }
+
+  .sheet .close {
+    position: absolute;
+    right: 12px; top: 12px;
+    z-index: 2;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(255,255,255,0.92);
+    color: var(--brand-blue-deep);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  /* ---------- Escritorio ---------- */
+  @media (min-width: 780px) {
+    header.topbar h1 { font-size: 1.4rem; }
+    header.topbar .brand img { width: 48px; height: 48px; }
+    .sheet {
+      left: auto;
+      right: 20px;
+      bottom: 20px;
+      width: 400px;
+      border-radius: 22px;
+      transform: translateY(calc(100% + 40px));
+      max-height: min(80vh, 720px);
+    }
+    .sheet.open { transform: translateY(0); }
+    .sheet .grabber { display: none; }
+    .cta-wrap { justify-content: flex-start; padding-left: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation-duration: 0.001s !important; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="Logo de ¿Qué es ahí?: un pin de mapa con un signo de interrogación sobre olas de colores" />
+      <h1>
+        ¿Qué es ahí?
+        <span class="en">/ ¿What's there?</span>
+        <span class="tag">BOGOTÁ · v0.1</span>
+      </h1>
+    </div>
+    <p>Toca un punto del mapa o pregunta por lo que tienes cerca.</p>
+    <div class="palette-strip" aria-hidden="true"></div>
+  </header>
+
+  <div id="map" role="application" aria-label="Mapa del centro histórico de Bogotá"></div>
+
+  <div class="cta-wrap">
+    <button class="cta" id="btnHere" aria-label="Buscar el lugar de interés más cercano a mi ubicación">
+      <span aria-hidden="true">📍</span>
+      <span class="label">¿Qué es ahí?</span>
+    </button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="sheet-backdrop" id="backdrop"></div>
+  <aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+    <div class="grabber" aria-hidden="true"></div>
+    <button class="close" id="sheetClose" aria-label="Cerrar ficha">×</button>
+    <div class="banner">
+      <span class="emoji" id="sheetEmoji" aria-hidden="true">📍</span>
+      <h2 id="sheetTitle">—</h2>
+    </div>
+    <div class="body" id="sheetBody"><!-- render dinámico --></div>
+  </aside>
+</div>
+
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+
+<script>
+/* =====================================================================
+   CAPA DE PERSISTENCIA (embebida)
+   Modelo "Place" según ARQUITECTURA_QUE_ES_AHI.md, sección 8.
+   En v0.1 del documento esto vive en public/data/places.json; aquí va
+   embebido para que la página funcione sin build ni servidor.
+   ===================================================================== */
+const PLACES_DATA = [
+  {
+    id: "plaza-de-bolivar",
+    slug: "plaza-de-bolivar",
+    name: "Plaza de Bolívar",
+    emoji: "🏛️",
+    color: "#C74A2C",
+    summary: "El corazón político e histórico de Bogotá y de Colombia.",
+    description:
+      "Plaza principal fundacional de la ciudad, rodeada por el Capitolio Nacional, la Catedral Primada, el Palacio Liévano (Alcaldía Mayor), el Palacio de Justicia y el edificio del antiguo Cabildo. Es un rectángulo despejado de piso duro donde confluyen el poder legislativo, judicial, ejecutivo local y eclesiástico.",
+    whyItMatters:
+      "Aquí se concentra la vida cívica del país: marchas, conciertos, posesiones presidenciales, mercados y celebraciones. El monumento a Simón Bolívar, inaugurado en 1846, fue la primera estatua pública de Bogotá.",
+    lookCloser:
+      "Observa el choque de estilos alrededor de la plaza: el Capitolio neoclásico de fachada dórica, el Palacio de Justicia moderno reconstruido tras 1985, la Catedral neoclásica y el Palacio Liévano de aire francés.",
+    historicalContext:
+      "En este solar estuvo la plaza mayor de la Santa Fe colonial desde 1539. Fue mercado público, plaza de toros y sitio de ejecuciones. Se llamó Plaza de la Constitución antes de tomar el nombre del Libertador.",
+    curiosity:
+      "El diseño actual, sobrio y sin jardines, es de 1960, obra del arquitecto Fernando Martínez Sanabria. Antes la plaza tenía prados, árboles y una reja perimetral.",
+    latitude: 4.59808,
+    longitude: -74.07605,
+    location: "La Candelaria, Bogotá D.C.",
+    categories: ["Historia", "Política", "Espacio público"],
+    images: [],
+    sources: ["Instituto Distrital de Patrimonio Cultural (IDPC)", "Banco de la República — Red Cultural"],
+    status: "published",
+    createdAt: "2026-08-29",
+    updatedAt: "2026-08-29"
+  },
+  {
+    id: "museo-del-oro",
+    slug: "museo-del-oro",
+    name: "Museo del Oro",
+    emoji: "🪙",
+    color: "#E0951E",
+    summary: "La mayor colección de orfebrería prehispánica del mundo, al alcance de nuestras manos.",
+    description:
+      "Museo del Banco de la República que reúne unas 34.000 piezas de oro y tumbaga y cerca de 25.000 objetos en cerámica, piedra, concha, hueso y textil, de culturas como Muisca, Quimbaya, Calima, Zenú, Tairona, Tolima y Nariño.",
+    whyItMatters:
+      "Transformó la manera en que Colombia entiende su pasado indígena: el oro deja de leerse como riqueza y pasa a entenderse como un lenguaje simbólico, ritual y político de las sociedades prehispánicas.",
+    lookCloser:
+      "Busca la Balsa Muisca, hallada en 1969 en una cueva en Pasca. Representa la ceremonia de El Dorado: el cacique cubierto de polvo de oro navegando la laguna de Guatavita con sus sacerdotes.",
+    historicalContext:
+      "El Banco de la República compró en 1939 su primera pieza, el poporo Quimbaya, para frenar la fundición y la exportación del patrimonio arqueológico. Esa compra dio origen a la colección.",
+    curiosity:
+      "La sala llamada «La Ofrenda» es un recinto oscuro y circular que se ilumina poco a poco, recreando la entrada ritual a un espacio sagrado lleno de piezas votivas.",
+    latitude: 4.60193,
+    longitude: -74.07216,
+    location: "Carrera 6 con calle 16, La Candelaria, Bogotá D.C.",
+    categories: ["Museo", "Arqueología", "Cultura"],
+    images: [],
+    sources: ["Museo del Oro — Banco de la República", "ICANH"],
+    status: "published",
+    createdAt: "2026-08-29",
+    updatedAt: "2026-08-29"
+  },
+  {
+    id: "cerro-de-monserrate",
+    slug: "cerro-de-monserrate",
+    name: "Cerro de Monserrate",
+    emoji: "⛰️",
+    color: "#7C8B4A",
+    summary: "El cerro tutelar de Bogotá, a unos 3.152 m sobre el nivel del mar.",
+    description:
+      "En la cima está el santuario del Señor Caído, meta de peregrinación. Se sube por funicular, por teleférico o por un camino peatonal empedrado. Desde el mirador se abarca casi toda la sabana de Bogotá.",
+    whyItMatters:
+      "Es el principal lugar de peregrinación de la ciudad y una referencia visual permanente: se ve desde casi cualquier punto de Bogotá y orienta a quien camina por el centro.",
+    lookCloser:
+      "Desde el mirador se distingue la retícula del centro histórico, la línea de los cerros orientales y, en días despejados, el páramo de Sumapaz hacia el sur.",
+    historicalContext:
+      "La ermita empezó a construirse hacia 1650. El funicular funciona desde 1929 y el teleférico desde 1955; antes solo se subía a pie o a lomo de mula.",
+    curiosity:
+      "El sendero de subida tiene cerca de 1.500 escalones. Los fines de semana lo recorren miles de personas, muchas rezando el vía crucis a lo largo del camino.",
+    latitude: 4.60570,
+    longitude: -74.05620,
+    location: "Cerros orientales, Bogotá D.C.",
+    categories: ["Religión", "Mirador", "Naturaleza"],
+    images: [],
+    sources: ["Corporación Cerro de Monserrate", "IDPC"],
+    status: "published",
+    createdAt: "2026-08-29",
+    updatedAt: "2026-08-29"
+  },
+  {
+    id: "teatro-colon",
+    slug: "teatro-colon",
+    name: "Teatro Colón",
+    emoji: "🎭",
+    color: "#3C5393",
+    summary: "El teatro nacional de Colombia, una joya del siglo XIX.",
+    description:
+      "Teatro de ópera de estilo neoclásico inaugurado en 1892, obra del arquitecto italiano Pietro Cantini, sobre la calle 10 del centro histórico. Es la sala patrimonial más importante del país.",
+    whyItMatters:
+      "Sede de las temporadas nacionales de ópera, danza y música sinfónica, y escenario de actos oficiales de Estado. Concentra buena parte de la memoria escénica del país.",
+    lookCloser:
+      "El telón de boca, pintado por Annibale Gatti, es una alegoría teatral. En el plafón del techo hay medallones con Calderón de la Barca, Shakespeare, Molière y otros dramaturgos.",
+    historicalContext:
+      "Se levantó sobre el antiguo Teatro Maldonado (1792) y se inauguró para el cuarto centenario del viaje de Cristóbal Colón, de donde viene su nombre.",
+    curiosity:
+      "Tiene capacidad para unas 900 personas y su acústica es considerada una de las mejores de América Latina.",
+    latitude: 4.59723,
+    longitude: -74.07444,
+    location: "Calle 10 # 5-32, La Candelaria, Bogotá D.C.",
+    categories: ["Patrimonio", "Arte", "Música"],
+    images: [],
+    sources: ["Ministerio de las Culturas — Teatro Colón", "IDPC"],
+    status: "published",
+    createdAt: "2026-08-29",
+    updatedAt: "2026-08-29"
+  },
+  {
+    id: "chorro-de-quevedo",
+    slug: "chorro-de-quevedo",
+    name: "Chorro de Quevedo",
+    emoji: "⛲",
+    color: "#05707F",
+    summary: "La plazoleta donde la tradición ubica la fundación de Bogotá.",
+    description:
+      "Pequeña plaza empedrada de La Candelaria, con una capilla y una fuente. Es punto de encuentro de cuenteros, músicos, artesanos y estudiantes, sobre todo al caer la tarde.",
+    whyItMatters:
+      "La tradición sostiene que aquí Gonzalo Jiménez de Quesada fundó Santa Fe el 6 de agosto de 1538, con doce chozas y una misa. Es un lugar simbólico del origen de la ciudad.",
+    lookCloser:
+      "La capilla que se ve hoy es una reconstrucción de 1969. El «chorro» es una fuente que recuerda el antiguo pilar de agua que abastecía al barrio.",
+    historicalContext:
+      "El nombre viene del fraile agustino Agustín de Quevedo y Zea, propietario del pilar de agua en el siglo XVIII.",
+    curiosity:
+      "Por el callejón del Embudo, junto a la plaza, se vende chicha en totuma: una bebida de maíz fermentado de raíz muisca.",
+    latitude: 4.59662,
+    longitude: -74.07130,
+    location: "Callejón del Embudo, La Candelaria, Bogotá D.C.",
+    categories: ["Historia", "Fundación", "Vida urbana"],
+    images: [],
+    sources: ["IDPC", "Alcaldía Local de La Candelaria"],
+    status: "published",
+    createdAt: "2026-08-29",
+    updatedAt: "2026-08-29"
+  },
+  {
+    id: "Academia Colombiana de la Historia",
+    slug: "Academia Colombiana de la Historia",
+    name: "Academia Colombiana de la Historia",
+    emoji: "🎭",
+    color: "#7C8B4A;",
+    summary: "La academia Colombiana de la historia, donde el patrimonio hitoríco y cultural reposa",
+    description:
+      "Inaugurada ofialmente el 11 de julio de 1910 con una colección de 2000 libros de historia americana donados por Jorge Pombo. Localizada en un salon del pasaje Rufino Cuervo. Como director Fabio Lozano y Lozano",
+    whyItMatters:
+      "Por que hace el estudio cuidadoso y análisis de la historia de Colombia desde los tiempos prehispanicos a la actualidad.",
+    lookCloser:
+      "La academia trabaja de manera conjunta con otras instituciones en la conservación del patrimonio documental y en la defensa y preservación del patrimonio histórico y cultural del pais.",
+    historicalContext:
+      "Fundad en 1902, autonoma de derecho privado y ocn personería jurídica sin animo de lucro.",
+    curiosity:
+      "Silenciosa e invisible escribe la historía de Colombia.",
+    latitude: 4.598117,
+    longitude: -74.077428,
+    location: "Callejón del Embudo, La Candelaria, Bogotá D.C.",
+    categories: ["Historia", "Fundación", "Vida urbana"],
+    images: [],
+    sources: ["IDPC", "Alcaldía Local de La Candelaria"],
+    status: "published",
+    createdAt: "2026-08-29",
+    updatedAt: "2026-08-29"
+  }
+];
+
+/* =====================================================================
+   CAPA DE REPOSITORIOS  (sección 5.4)
+   Interfaz común de acceso a datos. Hoy: implementación en memoria.
+   Mañana: IndexedDbPlaceRepository / SupabasePlaceRepository con la
+   misma firma, sin tocar la presentación.
+   ===================================================================== */
+const InMemoryPlaceRepository = {
+  async getAll() {
+    // Solo lugares publicados (estados editoriales, sección 8).
+    return PLACES_DATA.filter((p) => p.status === "published");
+  },
+  async getById(id) {
+    return PLACES_DATA.find((p) => p.id === id) || null;
+  }
+};
+
+const PlaceRepository = InMemoryPlaceRepository;
+
+/* =====================================================================
+   CAPA DE SERVICIOS  (sección 5.3)
+   Cálculo de distancias, geolocalización y búsqueda por proximidad.
+   ===================================================================== */
+const GeoService = {
+  // Distancia Haversine en metros entre dos {latitude, longitude}.
+  distanceMeters(a, b) {
+    const R = 6371000;
+    const toRad = (d) => (d * Math.PI) / 180;
+    const dLat = toRad(b.latitude - a.latitude);
+    const dLon = toRad(b.longitude - a.longitude);
+    const lat1 = toRad(a.latitude);
+    const lat2 = toRad(b.latitude);
+    const h =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  },
+
+  formatDistance(m) {
+    if (m < 1000) return `${Math.round(m / 10) * 10} m`;
+    return `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} km`;
+  },
+
+  // Devuelve { place, distance } del lugar más cercano al punto dado.
+  nearest(point, places) {
+    let best = null;
+    for (const place of places) {
+      const d = this.distanceMeters(point, place);
+      if (!best || d < best.distance) best = { place, distance: d };
+    }
+    return best;
+  },
+
+  // Promesa de posición del usuario. Guarda la última conocida (local-first, sección 6).
+  getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+      if (!("geolocation" in navigator)) {
+        reject(new Error("Este dispositivo no permite geolocalización."));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const point = {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            accuracy: pos.coords.accuracy
+          };
+          try {
+            localStorage.setItem("qea:lastPosition", JSON.stringify({ ...point, at: Date.now() }));
+          } catch (_) {}
+          resolve(point);
+        },
+        (err) => reject(err),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+      );
+    });
+  },
+
+  getLastKnownPosition() {
+    try {
+      const raw = localStorage.getItem("qea:lastPosition");
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+};
+
+/* =====================================================================
+   CAPA DE PRESENTACIÓN  (sección 5.1)
+   Mapa, marcadores, ficha de lugar, estados de carga y error.
+   No accede a los datos directamente: pasa por PlaceRepository.
+   ===================================================================== */
+const BOGOTA_CENTER = [4.5985, -74.0720];
+
+const UI = {
+  map: null,
+  userMarker: null,
+  userCircle: null,
+  markers: new Map(),
+  places: [],
+  lastFocusEl: null,
+
+  el: {
+    btn: document.getElementById("btnHere"),
+    btnLabel: document.querySelector("#btnHere .label"),
+    toast: document.getElementById("toast"),
+    sheet: document.getElementById("sheet"),
+    backdrop: document.getElementById("backdrop"),
+    sheetClose: document.getElementById("sheetClose"),
+    sheetTitle: document.getElementById("sheetTitle"),
+    sheetEmoji: document.getElementById("sheetEmoji"),
+    sheetBody: document.getElementById("sheetBody")
+  },
+
+  async init() {
+    this.map = L.map("map", { zoomControl: false, attributionControl: true })
+      .setView(BOGOTA_CENTER, 16);
+
+    L.control.zoom({ position: "topright" }).addTo(this.map);
+
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; colaboradores de <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(this.map);
+
+    // Carga de datos vía repositorio.
+    try {
+      this.places = await PlaceRepository.getAll();
+    } catch (e) {
+      this.toast("No se pudieron cargar los lugares. Recarga la página.");
+      return;
+    }
+
+    this.renderMarkers();
+    this.wireEvents();
+  },
+
+  renderMarkers() {
+    const bounds = [];
+    for (const place of this.places) {
+      const icon = L.divIcon({
+        className: "",
+        html: `<div class="poi-pin" style="--pin-color:${place.color || "#04437F"}"><span>${place.emoji || "📍"}</span></div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 32]
+      });
+      const marker = L.marker([place.latitude, place.longitude], {
+        icon,
+        keyboard: true,
+        title: place.name,
+        alt: place.name
+      }).addTo(this.map);
+
+      marker.on("click", () => this.openCard(place.id));
+      marker.on("keypress", (e) => {
+        if (e.originalEvent.key === "Enter") this.openCard(place.id);
+      });
+
+      this.markers.set(place.id, marker);
+      bounds.push([place.latitude, place.longitude]);
+    }
+    if (bounds.length) {
+      this.map.fitBounds(bounds, { padding: [70, 70], maxZoom: 16 });
+    }
+  },
+
+  wireEvents() {
+    this.el.btn.addEventListener("click", () => this.handleWhereAmI());
+    this.el.sheetClose.addEventListener("click", () => this.closeCard());
+    this.el.backdrop.addEventListener("click", () => this.closeCard());
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this.el.sheet.classList.contains("open")) this.closeCard();
+    });
+  },
+
+  setBusy(busy) {
+    const b = this.el.btn;
+    b.disabled = busy;
+    if (busy) {
+      b.querySelector('[aria-hidden="true"]').outerHTML = '<span class="spin" aria-hidden="true"></span>';
+      this.el.btnLabel.textContent = "Ubicándote…";
+    } else {
+      const s = b.querySelector(".spin");
+      if (s) s.outerHTML = '<span aria-hidden="true">📍</span>';
+      this.el.btnLabel.textContent = "¿Qué es ahí?";
+    }
+  },
+
+  async handleWhereAmI() {
+    this.setBusy(true);
+    this.toast("");
+    let point;
+    try {
+      point = await GeoService.getCurrentPosition();
+    } catch (err) {
+      const last = GeoService.getLastKnownPosition();
+      if (last) {
+        this.toast("Sin señal GPS ahora: uso tu última ubicación conocida.");
+        point = last;
+      } else {
+        this.setBusy(false);
+        const msg =
+          err && err.code === 1
+            ? "Permiso de ubicación denegado. Actívalo para usar esta función."
+            : "No pudimos obtener tu ubicación. Inténtalo de nuevo al aire libre.";
+        this.toast(msg);
+        return;
+      }
+    }
+
+    this.showUser(point);
+
+    const result = GeoService.nearest(point, this.places);
+    this.setBusy(false);
+
+    if (!result) {
+      this.toast("No hay lugares cargados todavía.");
+      return;
+    }
+
+    if (result.distance > 3000) {
+      this.toast(
+        `Estás a ${GeoService.formatDistance(result.distance)} del punto más cercano (${result.place.name}). Te lo muestro igual.`
+      );
+    }
+    this.map.flyTo([result.place.latitude, result.place.longitude], 17, { duration: 0.6 });
+    this.openCard(result.place.id, result.distance);
+  },
+
+  showUser(point) {
+    const ll = [point.latitude, point.longitude];
+    if (this.userMarker) {
+      this.userMarker.setLatLng(ll);
+    } else {
+      this.userMarker = L.marker(ll, {
+        icon: L.divIcon({ className: "", html: '<div class="user-dot"></div>', iconSize: [18, 18], iconAnchor: [9, 9] }),
+        zIndexOffset: 1000,
+        interactive: false
+      }).addTo(this.map);
+    }
+    if (point.accuracy) {
+      if (this.userCircle) {
+        this.userCircle.setLatLng(ll).setRadius(point.accuracy);
+      } else {
+        this.userCircle = L.circle(ll, {
+          radius: point.accuracy,
+          color: "#2563eb",
+          weight: 1,
+          fillColor: "#2563eb",
+          fillOpacity: 0.12
+        }).addTo(this.map);
+      }
+    }
+  },
+
+  async openCard(id, distance) {
+    const place = await PlaceRepository.getById(id);
+    if (!place) return;
+
+    this.lastFocusEl = document.activeElement;
+
+    let distChip = "";
+    if (typeof distance === "number") {
+      distChip = `<span class="chip dist">a ${GeoService.formatDistance(distance)} de ti</span>`;
+    } else {
+      const last = GeoService.getLastKnownPosition();
+      if (last) {
+        const d = GeoService.distanceMeters(last, place);
+        distChip = `<span class="chip dist">~${GeoService.formatDistance(d)}</span>`;
+      }
+    }
+
+    const cats = (place.categories || [])
+      .map((c) => `<span class="chip">${c}</span>`)
+      .join("");
+
+    const block = (label, text) =>
+      text ? `<section class="block"><h3>${label}</h3><p>${text}</p></section>` : "";
+
+    const gmaps = `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`;
+    const osm = `https://www.openstreetmap.org/?mlat=${place.latitude}&mlon=${place.longitude}#map=18/${place.latitude}/${place.longitude}`;
+
+    this.el.sheetTitle.textContent = place.name;
+    this.el.sheetEmoji.textContent = place.emoji || "📍";
+    this.el.sheet.querySelector(".banner").style.setProperty("--c", place.color || "#04437F");
+    this.el.sheetBody.innerHTML = `
+      <div class="meta">${distChip}${cats}</div>
+      <p class="summary">${place.summary || ""}</p>
+      <p class="location">📌 ${place.location || ""}</p>
+      <section class="block"><p>${place.description || ""}</p></section>
+      ${block("Por qué importa", place.whyItMatters)}
+      ${block("Míralo de cerca", place.lookCloser)}
+      ${block("Contexto histórico", place.historicalContext)}
+      ${block("Curiosidad", place.curiosity)}
+      <div class="actions">
+        <a href="${gmaps}" target="_blank" rel="noopener">Cómo llegar</a>
+        <a class="ghost" href="${osm}" target="_blank" rel="noopener">Ver en OSM</a>
+      </div>
+      <p class="sources"><strong>Fuentes:</strong> ${(place.sources || []).join(" · ") || "—"}</p>
+    `;
+
+    this.el.sheet.classList.add("open");
+    this.el.sheet.setAttribute("aria-hidden", "false");
+    this.el.backdrop.classList.add("open");
+    this.el.sheetClose.focus();
+  },
+
+  closeCard() {
+    this.el.sheet.classList.remove("open");
+    this.el.sheet.setAttribute("aria-hidden", "true");
+    this.el.backdrop.classList.remove("open");
+    if (this.lastFocusEl && this.lastFocusEl.focus) this.lastFocusEl.focus();
+  },
+
+  toast(msg) {
+    const t = this.el.toast;
+    if (!msg) {
+      t.classList.remove("show");
+      return;
+    }
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => t.classList.remove("show"), 5200);
+  }
+};
+
+if (window.L) {
+  UI.init();
+} else {
+  document.getElementById("map").innerHTML =
+    '<p style="color:#fff;padding:24px;font:14px/1.5 sans-serif">No se pudo cargar Leaflet. Revisa tu conexión a internet.</p>';
+}
+</script>
+</body>
+</html>
