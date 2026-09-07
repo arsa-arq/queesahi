@@ -19,6 +19,10 @@ Y abre <http://localhost:8000>.
 > **No abras `index.html` con doble clic.** La aplicación usa módulos ES y carga
 > los datos con `fetch`; el navegador bloquea las dos cosas bajo el protocolo
 > `file://`. Hace falta un servidor, aunque sea el de una línea de arriba.
+>
+> Si lo intentas, la página te lo explicará en pantalla en vez de quedarse
+> muda: hay un script clásico en `index.html`, fuera de los módulos, que se
+> ejecuta precisamente en ese caso.
 
 Se necesita conexión a internet para las teselas de OpenStreetMap y para
 Leaflet, que se cargan por CDN.

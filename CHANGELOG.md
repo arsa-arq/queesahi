@@ -81,6 +81,12 @@ en el [ADR 0002](docs/adr/0002-sin-paso-de-construccion-en-v0.2.md).
 `index.html` ya no funciona abriéndolo con doble clic: hacen falta módulos ES y
 `fetch`, que el navegador bloquea bajo `file://`. Usa `npm start`.
 
+Quien lo intente **verá una explicación en pantalla con el comando a ejecutar**,
+no una página muda. Bajo `file://` el navegador ni siquiera llega a cargar
+`main.js`, así que el aviso lo da un script clásico incrustado en `index.html`,
+que es el único código que se ejecuta en ese escenario. El mismo script avisa si
+un `<script>` falla al cargar por cualquier otro motivo.
+
 ## [0.1.0] — 2026-08-29
 
 Prototipo inicial: página única con mapa Leaflet, seis puntos de interés
