@@ -19,9 +19,8 @@ this.el.sheetBody.innerHTML = `
 
 Mientras los datos estaban escritos a mano dentro de `index.html`, eso era
 inofensivo: el único que podía inyectar HTML era quien ya estaba editando el
-archivo. Pero el roadmap mueve esos mismos datos a `places.json` (v0.2), a
-IndexedDB (v0.3), a Supabase (v0.6) y a un panel de edición con varios usuarios
-(v0.7). En cuanto el texto lo escriba otra persona, cada campo se convierte en
+archivo. Pero el roadmap mueve esos mismos datos a IndexedDB (v0.4), a Supabase
+(v0.6) y a un panel de edición con varios usuarios (v0.7). En cuanto el texto lo escriba otra persona, cada campo se convierte en
 un vector de XSS almacenado, y el fallo aparecería a mitad de una migración,
 donde nadie lo está buscando.
 

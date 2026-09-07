@@ -1,13 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { createInMemoryPlaceRepository } from "../../src/repositories/inMemoryPlaceRepository.js";
-import { createPlaceRepository } from "../../src/repositories/placeRepository.js";
 import {
-  createJsonPlaceRepository,
-  parsePlacesDocument
-} from "../../src/repositories/jsonPlaceRepository.js";
-import { PLACE_STATUSES } from "../../src/types/place.js";
+  placeRepository,
+  embeddedPlaceRepository,
+  inMemoryPlaceRepository,
+  types
+} from "../helpers/loadApp.mjs";
+
+const { createPlaceRepository } = placeRepository;
+const { createEmbeddedPlaceRepository, parsePlacesDocument } = embeddedPlaceRepository;
+const { createInMemoryPlaceRepository } = inMemoryPlaceRepository;
+const { PLACE_STATUSES } = types;
 
 /** @param {string} id @param {string} status */
 const place = (id, status) => ({
@@ -80,11 +84,11 @@ test("un fallo de carga no se queda cacheado", async () => {
   let attempts = 0;
   const repository = createPlaceRepository(async () => {
     attempts += 1;
-    if (attempts === 1) throw new Error("red caída");
+    if (attempts === 1) throw new Error("datos corruptos");
     return FIXTURE;
   });
 
-  await assert.rejects(() => repository.getAll(), /red caída/);
+  await assert.rejects(() => repository.getAll(), /datos corruptos/);
   const places = await repository.getAll();
   assert.equal(places.length, 1, "el segundo intento sí funciona");
 });
@@ -111,30 +115,28 @@ test("parsePlacesDocument: rechaza basura", () => {
   assert.throws(() => parsePlacesDocument(null), /formato esperado/);
 });
 
-test("createJsonPlaceRepository: explica qué hacer si el fetch falla", async () => {
-  const repository = createJsonPlaceRepository("./x.json", async () => {
-    throw new TypeError("Failed to fetch");
-  });
-  await assert.rejects(() => repository.getAll(), /npm start/);
-});
-
-test("createJsonPlaceRepository: informa del código HTTP", async () => {
-  const repository = createJsonPlaceRepository("./x.json", async () => ({
-    ok: false,
-    status: 404
-  }));
-  await assert.rejects(() => repository.getAll(), /HTTP 404/);
-});
-
-test("createJsonPlaceRepository: lee un documento correcto", async () => {
-  const repository = createJsonPlaceRepository("./x.json", async () => ({
-    ok: true,
-    status: 200,
-    json: async () => ({ schemaVersion: 1, places: FIXTURE })
-  }));
+test("repositorio embebido: lee el documento que se le pasa", async () => {
+  const repository = createEmbeddedPlaceRepository({ schemaVersion: 1, places: FIXTURE });
   const places = await repository.getAll();
   assert.deepEqual(
     places.map((p) => p.id),
     ["publicado"]
   );
+});
+
+test("repositorio embebido: explica qué falta si no se cargaron los datos", async () => {
+  // Caso real: alguien borra el <script> de places.js de index.html.
+  const repository = createEmbeddedPlaceRepository(null);
+  await assert.rejects(() => repository.getAll(), /formato esperado/);
+});
+
+test("repositorio embebido: usa el global cuando no se le pasa nada", async () => {
+  const previous = globalThis.__QEA_PLACES__;
+  globalThis.__QEA_PLACES__ = { schemaVersion: 1, places: FIXTURE };
+  try {
+    const repository = createEmbeddedPlaceRepository();
+    assert.equal((await repository.getAll()).length, 1);
+  } finally {
+    globalThis.__QEA_PLACES__ = previous;
+  }
 });

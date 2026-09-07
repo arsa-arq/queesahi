@@ -4,29 +4,15 @@
  * Corresponde a la sección 8 de ARCHITECTURE.md («Modelo de datos inicial»).
  * Se declara con JSDoc en lugar de TypeScript para que la aplicación siga
  * ejecutándose sin build; `npm run typecheck` valida estos tipos con `tsc`
- * gracias a `jsconfig.json` (checkJs). Al migrar a TypeScript (ver
- * docs/adr/0002), este archivo se convierte en `place.ts` casi tal cual.
+ * gracias a `jsconfig.json` (checkJs).
+ *
+ * Depende de: app/namespace.js
  */
 
 /**
  * Estados editoriales de un lugar (sección 8 de ARCHITECTURE.md).
  * @typedef {"draft"|"review"|"approved"|"published"|"archived"} PlaceStatus
  */
-
-/** Todos los estados editoriales válidos, en orden de maduración. */
-export const PLACE_STATUSES = /** @type {PlaceStatus[]} */ ([
-  "draft",
-  "review",
-  "approved",
-  "published",
-  "archived"
-]);
-
-/**
- * Estados que la aplicación pública muestra a cualquier visitante.
- * Todo lo demás es material editorial en preparación y no debe salir a la web.
- */
-export const PUBLIC_STATUSES = /** @type {PlaceStatus[]} */ (["published"]);
 
 /**
  * Un punto de interés.
@@ -83,8 +69,8 @@ export const PUBLIC_STATUSES = /** @type {PlaceStatus[]} */ (["published"]);
 /**
  * Contrato de acceso a datos (sección 5.4 de ARCHITECTURE.md).
  *
- * Cualquier implementación —JSON, IndexedDB, Supabase— debe cumplir esta
- * interfaz para que la capa de presentación no cambie.
+ * Cualquier implementación —datos embebidos, IndexedDB, Supabase— debe cumplir
+ * esta interfaz para que la capa de presentación no cambie.
  *
  * @typedef {Object} PlaceRepository
  * @property {(options?: QueryOptions) => Promise<Place[]>} getAll
@@ -93,4 +79,25 @@ export const PUBLIC_STATUSES = /** @type {PlaceStatus[]} */ (["published"]);
  * @property {() => Promise<Place[]>} refresh Vacía la caché y vuelve a cargar.
  */
 
-export {};
+(function (global) {
+  "use strict";
+
+  const QEA = global.QEA;
+
+  /** Todos los estados editoriales válidos, en orden de maduración. */
+  const PLACE_STATUSES = /** @type {PlaceStatus[]} */ ([
+    "draft",
+    "review",
+    "approved",
+    "published",
+    "archived"
+  ]);
+
+  /**
+   * Estados que la aplicación pública muestra a cualquier visitante.
+   * Todo lo demás es material editorial en preparación y no debe salir a la web.
+   */
+  const PUBLIC_STATUSES = /** @type {PlaceStatus[]} */ (["published"]);
+
+  QEA.define("types", { PLACE_STATUSES, PUBLIC_STATUSES });
+})(globalThis);

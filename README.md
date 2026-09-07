@@ -6,9 +6,21 @@ más cerca: qué pasó allí, por qué importa y qué mirar cuando estés delant
 
 Proyecto de la Cátedra Bogotá. Versión **0.2**.
 
-## Ejecutarlo
+## Abrirlo
 
-Necesitas [Node.js](https://nodejs.org) 20 o superior. Nada más.
+**Doble clic en `index.html`.** Nada que instalar, nada que compilar.
+
+Solo hace falta conexión a internet, porque el mapa (Leaflet) y las teselas
+(OpenStreetMap) se cargan desde la red.
+
+Que esto siga siendo así es un requisito del proyecto, no una casualidad: está
+escrito en el [ADR 0005](docs/adr/0005-abrir-con-doble-clic-sin-servidor.md) y
+lo verifica una prueba.
+
+### Con servidor local
+
+Solo lo necesitas para probar desde el teléfono en la misma red. Requiere
+[Node.js](https://nodejs.org) 20 o superior:
 
 ```bash
 npm start
@@ -16,25 +28,15 @@ npm start
 
 Y abre <http://localhost:8000>.
 
-> **No abras `index.html` con doble clic.** La aplicación usa módulos ES y carga
-> los datos con `fetch`; el navegador bloquea las dos cosas bajo el protocolo
-> `file://`. Hace falta un servidor, aunque sea el de una línea de arriba.
->
-> Si lo intentas, la página te lo explicará en pantalla en vez de quedarse
-> muda: hay un script clásico en `index.html`, fuera de los módulos, que se
-> ejecuta precisamente en ese caso.
-
-Se necesita conexión a internet para las teselas de OpenStreetMap y para
-Leaflet, que se cargan por CDN.
-
 ## Comandos
 
 | Comando | Qué hace |
 |---|---|
-| `npm start` | Servidor de desarrollo en el puerto 8000 (`npm start -- 3000` para otro). |
-| `npm run validate` | Revisa `public/data/places.json`: campos, coordenadas, duplicados, fuentes. |
+| `npm start` | Servidor local en el puerto 8000 (`npm start -- 3000` para otro). Opcional. |
+| `npm run validate` | Revisa `public/data/places.js`: campos, coordenadas, duplicados, fuentes. |
 | `npm test` | Pruebas unitarias. Sin dependencias: usa el `node:test` incorporado. |
 | `npm run typecheck` | Verifica los tipos JSDoc con TypeScript. Requiere `npm install`. |
+| `npm run export:json` | Exporta los datos a `places.json` para otras herramientas. |
 | `npm run check` | `validate` + `test`. Lo mínimo antes de proponer un cambio. |
 
 ## Qué incluye
@@ -56,18 +58,18 @@ Leaflet, que se cargan por CDN.
 
 ```text
 que-es-ahi/
-├── index.html              solo el esqueleto; ni estilos ni lógica
-├── public/data/places.json los datos (capa de persistencia, v0.2)
+├── index.html              esqueleto y orden de carga de los scripts
+├── public/data/places.js   los datos (capa de persistencia, v0.2)
 ├── src/
-│   ├── app/                config.js y main.js — el único sitio que conecta capas
-│   ├── repositories/       acceso a datos (JSON hoy; IndexedDB y Supabase después)
+│   ├── app/                namespace.js, config.js y main.js
+│   ├── repositories/       acceso a datos (embebidos hoy; IndexedDB y Supabase después)
 │   ├── services/           geoService.js (puro) y locationService.js (dispositivo)
 │   ├── features/           map/, places/, location/
 │   ├── ui/                 componentes sueltos (toast)
 │   ├── types/              modelo Place en JSDoc
 │   ├── utils/              html.js — escapado seguro
 │   └── styles/             tokens.css (marca) y app.css
-├── scripts/                serve.mjs y validate-places.mjs
+├── scripts/                serve.mjs, validate-places.mjs, export-json.mjs
 ├── tests/unit/             pruebas
 └── docs/adr/               por qué el código es como es
 ```
@@ -76,6 +78,11 @@ La correspondencia con las capas de `ARCHITECTURE.md` es directa: presentación
 (5.1) en `features/` y `ui/`, funcionalidades (5.2) en `features/`, servicios
 (5.3) en `services/`, repositorios (5.4) en `repositories/` y persistencia (5.5)
 en `public/data/`. **La presentación nunca accede a los datos directamente.**
+
+Los archivos son scripts clásicos, no módulos ES: es lo que permite el doble
+clic. A cambio, **el orden de los `<script>` en `index.html` importa**. Cada
+archivo declara de qué depende en su cabecera, y una prueba comprueba que el
+orden lo respete.
 
 ## Paleta de marca
 
@@ -98,7 +105,7 @@ banner de cada ficha. Cada lugar publicado usa un color y un emoji distintos;
 
 ## Añadir un lugar
 
-Ver [`AGENTS.md`](AGENTS.md). En resumen: editar `public/data/places.json`,
+Ver [`AGENTS.md`](AGENTS.md). En resumen: editar `public/data/places.js`,
 `npm run check`, y Pull Request.
 
 ## Documentación
@@ -117,6 +124,9 @@ Ver [`AGENTS.md`](AGENTS.md). En resumen: editar `public/data/places.json`,
 ## Estado
 
 La v0.2 aplaza a propósito React + TypeScript + Vite, que la arquitectura pide
-para la v0.1. El motivo y las condiciones para migrar están en el
-[ADR 0002](docs/adr/0002-sin-paso-de-construccion-en-v0.2.md): la separación en
-capas ya está hecha en archivos reales, así que la migración será mecánica.
+para la v0.1, y renuncia también a los módulos ES. Las dos decisiones tienen el
+mismo motivo y están documentadas:
+[ADR 0002](docs/adr/0002-sin-paso-de-construccion-en-v0.2.md) y
+[ADR 0005](docs/adr/0005-abrir-con-doble-clic-sin-servidor.md). La separación en
+capas ya está hecha en archivos reales, así que la migración, cuando toque, será
+mecánica.

@@ -30,4 +30,4 @@ labels: contenido
 ## Antes de enviar
 
 - [ ] Está en Bogotá y, preferiblemente, en el centro histórico.
-- [ ] No está ya en `public/data/places.json`.
+- [ ] No está ya en `public/data/places.js`.

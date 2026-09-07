@@ -12,12 +12,13 @@ registrada como primer commit del repositorio.
 ### v0.2 — arquitectura y contenido fiable ← **versión actual**
 - Repositorio Git con historial, documentación de gobierno y CI.
 - Código separado en capas reales: repositorios, servicios, funcionalidades.
-- Datos en `public/data/places.json` con `JsonPlaceRepository`.
+- Datos en `public/data/places.js` con `EmbeddedPlaceRepository`.
 - Geolocalización, distancia y lugar más cercano (lo que el documento pedía
   para la v0.2).
 - Escapado de HTML en todas las fichas.
 - Validador de contenido y pruebas unitarias en integración continua.
 - Enlaces compartibles por lugar y foco atrapado en la ficha.
+- Se abre con doble clic, sin servidor ni instalación ([ADR 0005](docs/adr/0005-abrir-con-doble-clic-sin-servidor.md)).
 
 ## Siguiente
 
@@ -66,6 +67,8 @@ Dominio definitivo, seguridad, rendimiento y operación.
 |---|---|---|
 | Leaflet por CDN de terceros | `index.html` | v0.4 |
 | Sin pruebas E2E | `tests/` | v0.3, con Playwright |
+| El arranque bajo `file://` se verifica a mano | CI | v0.3 |
+| Sin tipos entre archivos (`QEA.require` devuelve `any`) | `src/` | al migrar a TypeScript |
 | `docs/product/contenido-por-verificar.md` con datos sin confirmar | contenido | continuo |
 | Sin licencia declarada en `package.json` | raíz | antes de publicar |
 | Carpetas `content/` y `supabase/` de la sección 10 aún sin crear | raíz | cuando haya qué poner en ellas |

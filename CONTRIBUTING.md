@@ -51,6 +51,7 @@ Cada PR debe traer:
 1. **Qué cambia y por qué.** Si es estructural, enlace al ADR.
 2. **Cómo se comprobó.** Comandos ejecutados y qué se miró en el navegador.
 3. **`npm run check` en verde.** La CI lo repite, pero no la uses de linter.
+   Y ábrelo con doble clic: es el modo en que lo usa el equipo.
 4. **`CHANGELOG.md` actualizado**, salvo en cambios internos sin efecto visible.
 5. **Captura de pantalla** si cambia algo que se ve.
 

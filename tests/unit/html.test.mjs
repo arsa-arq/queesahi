@@ -1,7 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { escapeHtml, html, isHexColor, raw, safeUrl, toHtmlString } from "../../src/utils/html.js";
+import { html as htmlModule } from "../helpers/loadApp.mjs";
+
+const { escapeHtml, html, isHexColor, raw, safeUrl, toHtmlString } = htmlModule;
 
 test("escapeHtml: neutraliza los caracteres con significado en HTML", () => {
   assert.equal(escapeHtml('<script>alert("x")</script>'), "&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;");

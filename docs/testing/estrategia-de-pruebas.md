@@ -14,8 +14,9 @@ las cosas que aquí se automatizan.
 |---|---|---|
 | Servicios puros (`geoService`) | `node:test` | 12 pruebas |
 | Utilidades (`html`) | `node:test` | 11 pruebas |
-| Repositorios | `node:test` con dobles de `fetch` | 13 pruebas |
-| Datos reales (`places.json`) | `node:test` + `validate-places.mjs` | 7 pruebas + validador |
+| Repositorios | `node:test` con dobles del documento | 13 pruebas |
+| Orden de carga de `index.html` | `node:test` sobre el HTML | 6 pruebas |
+| Datos reales (`places.js`) | `node:test` + `validate-places.mjs` | 7 pruebas + validador |
 | Presentación (mapa, ficha) | manual, en navegador | pendiente de E2E en v0.3 |
 
 ```bash
@@ -26,6 +27,15 @@ npm run check     # ambas
 
 Sin dependencias: `node:test` viene con Node. Que las pruebas corran sin
 `npm install` es deliberado (ver [ADR 0002](../adr/0002-sin-paso-de-construccion-en-v0.2.md)).
+
+## Por qué se prueba el orden de los `<script>`
+
+Sin módulos ES ([ADR 0005](../adr/0005-abrir-con-doble-clic-sin-servidor.md)),
+el orden de los `<script>` de `index.html` *es* el grafo de dependencias: un
+archivo nuevo en la posición equivocada rompe el arranque, y solo se nota
+abriendo la página. `tests/unit/cargaDeScripts.test.mjs` lee `index.html`, lee la
+línea `Depende de:` de cada archivo y comprueba que el orden la respete. Es la
+red bajo la fragilidad que esa decisión introduce.
 
 ## Por qué la geometría está separada del dispositivo
 
@@ -47,6 +57,11 @@ fixtures parciales de `Place` para que cada caso se lea de un vistazo, y
 exigirles el objeto completo las volvería ilegibles sin ganar nada. Su
 corrección la garantiza ejecutarlas.
 
+Ojo con el alcance real: al no haber módulos, `tsc` ve un único ámbito global y
+`QEA.require()` devuelve `any`. El chequeo **dentro** de cada archivo sigue
+siendo estricto; el que cruza fronteras entre archivos, no. Es una pérdida
+consciente, anotada en el ADR 0005.
+
 ## Qué falta
 
 - **E2E con Playwright (v0.3).** Los caminos que hoy solo se comprueban a mano:
@@ -55,6 +70,14 @@ corrección la garantiza ejecutarlas.
   concedido, denegado y sin señal.
 - **Pruebas de accesibilidad**, sobre todo del foco atrapado en la ficha.
 - **Pruebas en dispositivo real**, que es donde de verdad se comporta el GPS.
+- **Comprobación automática del arranque bajo `file://`.** Hoy se verifica a
+  mano con Chrome sin interfaz:
+
+  ```bash
+  chrome --headless=new --dump-dom "file:///ruta/al/index.html"
+  ```
+
+  Debería salir en la CI, junto con las pruebas E2E de la v0.3.
 
 ## Al añadir una prueba
 

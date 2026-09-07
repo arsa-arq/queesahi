@@ -2,6 +2,53 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.1] — 2026-09-07
+
+### Corregido
+
+- **`index.html` vuelve a abrirse con doble clic.** La 0.2.0 pasó a módulos ES
+  y a leer los datos con `fetch`; el navegador bloquea ambas cosas bajo
+  `file://`, así que la herramienta dejó de poder abrirse sin levantar un
+  servidor. Peor: fallaba en silencio, porque el bloqueo impide que llegue a
+  ejecutarse siquiera el código que mostraría el error.
+
+  Era una regresión de producto, no un detalle técnico: quien escribe las
+  fichas necesita comprobar cómo quedaron, y un prototipo de la Cátedra se abre
+  en portátiles prestados, delante de gente que evalúa. Ver
+  [ADR 0005](docs/adr/0005-abrir-con-doble-clic-sin-servidor.md).
+
+### Cambiado
+
+- **Scripts clásicos en vez de módulos ES.** Cada archivo de `src/` se registra
+  en el espacio de nombres `QEA` (`src/app/namespace.js`) e `index.html` declara
+  el orden de carga. Las capas siguen en archivos separados.
+- **Datos embebidos en vez de `fetch`.** La fuente de verdad pasa de
+  `public/data/places.json` a `public/data/places.js`, con el mismo contenido
+  JSON cargado como script. `EmbeddedPlaceRepository` sustituye a
+  `JsonPlaceRepository`.
+- `npm start` sigue existiendo, pero solo para lo que de verdad lo necesita:
+  probar desde el teléfono en la misma red.
+
+### Añadido
+
+- `npm run export:json`, que genera un `places.json` de verdad para otras
+  herramientas. No se versiona, para que nadie lo confunda con el original.
+- `tests/unit/cargaDeScripts.test.mjs`: seis pruebas que comprueban que el orden
+  de los `<script>` de `index.html` respete las dependencias declaradas en la
+  cabecera de cada archivo. Es la red bajo la fragilidad que introduce renunciar
+  a los módulos.
+- Un trabajo de integración continua que abre `index.html` con `file://` en
+  Chrome sin interfaz y falla si no aparecen los seis marcadores.
+- Regla CSS `[hidden] { display: none !important }`, que faltaba: varios
+  contenedores declaran `display: flex` y anulaban el atributo.
+
+### Nota sobre los tipos
+
+Sin módulos, `tsc` ve un único ámbito global y `QEA.require()` devuelve `any`.
+El chequeo dentro de cada archivo sigue siendo estricto; el que cruza fronteras
+entre archivos se pierde. Es el precio de esta decisión, anotado en el ADR 0005
+y en `docs/testing/estrategia-de-pruebas.md`.
+
 ## [0.2.0] — 2026-09-05
 
 Reestructuración a partir de la revisión del prototipo. La aplicación hace lo
@@ -42,7 +89,7 @@ enlaces compartibles; el cambio grande está debajo.
   `SECURITY.md`, `CHANGELOG.md` y `docs/adr/` (secciones 10, 11 y 18).
 - `scripts/validate-places.mjs`: valida el contenido y falla la CI si hay
   errores. Detecta los seis defectos de arriba. Ver [ADR 0004](docs/adr/0004-validacion-automatica-del-contenido.md).
-- 43 pruebas unitarias con `node:test`, sin dependencias.
+- 43 pruebas unitarias con `node:test`, sin dependencias (49 desde la 0.2.1).
 - Integración continua en GitHub Actions: validate, test, typecheck.
 - Verificación de tipos con JSDoc + `tsc` (`jsconfig.json`).
 - `scripts/serve.mjs`: servidor de desarrollo sin dependencias.
@@ -55,9 +102,9 @@ enlaces compartibles; el cambio grande está debajo.
 
 ### Cambiado
 
-- **Los datos salen del código.** `PLACES_DATA` pasa a
-  `public/data/places.json`, leído por `JsonPlaceRepository`. El documento
-  lleva `schemaVersion` para poder migrar el formato más adelante.
+- **Los datos salen del código.** `PLACES_DATA` pasa a un archivo propio, con
+  `schemaVersion` para poder migrar el formato más adelante. (La 0.2.1 cambia
+  ese archivo de `places.json` a `places.js`.)
 - **El código se reparte en capas reales.** `index.html` pasa de 971 líneas a
   solo el esqueleto; la lógica vive en `src/`, con una capa por carpeta.
 - **La geometría se separa del dispositivo.** `geoService.js` queda como
@@ -76,16 +123,11 @@ Esta versión **no** migra a React + TypeScript + Vite, que la arquitectura pide
 desde la v0.1. La decisión, sus motivos y las condiciones para revertirla están
 en el [ADR 0002](docs/adr/0002-sin-paso-de-construccion-en-v0.2.md).
 
-### Cambio incompatible
+### Cambio incompatible (revertido en 0.2.1)
 
-`index.html` ya no funciona abriéndolo con doble clic: hacen falta módulos ES y
-`fetch`, que el navegador bloquea bajo `file://`. Usa `npm start`.
-
-Quien lo intente **verá una explicación en pantalla con el comando a ejecutar**,
-no una página muda. Bajo `file://` el navegador ni siquiera llega a cargar
-`main.js`, así que el aviso lo da un script clásico incrustado en `index.html`,
-que es el único código que se ejecuta en ese escenario. El mismo script avisa si
-un `<script>` falla al cargar por cualquier otro motivo.
+`index.html` dejó de funcionar con doble clic: pasó a necesitar módulos ES y
+`fetch`, que el navegador bloquea bajo `file://`. Fue un error de criterio; la
+0.2.1 lo corrige.
 
 ## [0.1.0] — 2026-08-29
 

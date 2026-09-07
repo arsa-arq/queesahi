@@ -5,7 +5,7 @@ Datos publicados que todavía no están confirmados contra una fuente citable.
 del proyecto.
 
 Cuando confirmes un punto: añade la fuente al lugar en
-`public/data/places.json`, actualiza su `updatedAt` y borra la fila de aquí, en
+`public/data/places.js`, actualiza su `updatedAt` y borra la fila de aquí, en
 el mismo Pull Request.
 
 ## Academia Colombiana de Historia
@@ -29,7 +29,7 @@ publicado por no poder citarlos; se anotan aquí para no perderlos.
 **Si en la revisión no se confirman**, la salida correcta es poner el lugar en
 `status: "review"`: desaparece del mapa, conserva el trabajo hecho y no
 compromete la credibilidad del proyecto. Es un cambio de una palabra en
-`places.json`.
+`places.js`.
 
 ## Revisión general pendiente
 

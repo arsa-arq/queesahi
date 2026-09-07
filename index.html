@@ -25,7 +25,7 @@
     <link rel="apple-touch-icon" href="logo.png" />
 
     <!-- Cartografía: Leaflet + OpenStreetMap por CDN, con verificación de integridad.
-         Pendiente de v0.5: servir la librería desde el propio dominio (ROADMAP.md). -->
+         Pendiente de v0.4: servir la librería desde el propio dominio (ROADMAP.md). -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -98,85 +98,53 @@
       </p>
     </noscript>
 
+    <!-- ===================================================================
+         Carga de la aplicación.
+
+         Son <script> clásicos, NO módulos ES, y esa es una decisión
+         deliberada: los módulos exigen un servidor, y aquí hace falta que
+         index.html se pueda abrir con doble clic, sin instalar nada.
+         Ver docs/adr/0005-abrir-con-doble-clic-sin-servidor.md
+
+         El precio es que el orden importa. Cada archivo declara de qué
+         depende en su cabecera, y QEA.require() falla con un mensaje claro si
+         algo se carga antes de tiempo. El orden es: base → datos → tipos →
+         utilidades → configuración → servicios → repositorios → presentación
+         → arranque.
+         =================================================================== -->
+
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
 
-    <!--
-      Script clásico a propósito, NO un módulo.
+    <script src="src/app/namespace.js"></script>
 
-      Bajo file:// el navegador bloquea los módulos ES, así que `main.js` no
-      llega a ejecutarse y no puede mostrar ningún error: la página se queda con
-      la cabecera y un hueco azul, sin explicar nada. Este script sí corre, y es
-      lo único que se interpone entre alguien que abre el archivo con doble clic
-      y una pantalla muda.
-    -->
-    <script>
-      (function () {
-        function panel(title, body) {
-          var map = document.getElementById("map");
-          if (!map) return;
-          map.textContent = "";
-          var box = document.createElement("div");
-          box.className = "needs-server";
-          box.setAttribute("role", "alert");
-          box.innerHTML =
-            "<h2>" +
-            title +
-            "</h2>" +
-            body +
-            '<p class="hint">Encontrarás el detalle en <code>README.md</code>.</p>';
-          map.appendChild(box);
-        }
+    <!-- Capa de persistencia (5.5) -->
+    <script src="public/data/places.js"></script>
 
-        function whenReady(run) {
-          if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", run);
-          } else {
-            run();
-          }
-        }
+    <!-- Modelo y utilidades -->
+    <script src="src/types/place.js"></script>
+    <script src="src/utils/html.js"></script>
+    <script src="src/app/config.js"></script>
 
-        if (window.location.protocol === "file:") {
-          whenReady(function () {
-            // El botón nunca recibirá su manejador: mejor no ofrecerlo.
-            var cta = document.querySelector(".cta-wrap");
-            if (cta) cta.hidden = true;
-            panel(
-              "Esta página necesita un servidor",
-              "<p>La abriste con doble clic. En ese modo el navegador bloquea, por " +
-                "seguridad, la carga de los datos del mapa, así que no hay nada que " +
-                "mostrar.</p>" +
-                "<p>Abre una terminal en la carpeta del proyecto y ejecuta:</p>" +
-                "<pre><code>npm start</code></pre>" +
-                "<p>Después entra a <strong>http://localhost:8000</strong>. " +
-                "Necesitas Node.js 20 o superior.</p>"
-            );
-          });
-          return;
-        }
+    <!-- Capa de servicios (5.3) -->
+    <script src="src/services/geoService.js"></script>
+    <script src="src/services/locationService.js"></script>
 
-        // Red de seguridad para el resto de casos: si el módulo no carga (un
-        // archivo movido, un error de sintaxis), al menos se dice en voz alta.
-        window.addEventListener("error", function (event) {
-          if (event.target && event.target.tagName === "SCRIPT") {
-            whenReady(function () {
-              panel(
-                "No se pudo cargar la aplicación",
-                "<p>Falta un archivo o no se pudo leer: <code>" +
-                  String(event.target.src || "") +
-                  "</code></p><p>Comprueba que el servidor se está ejecutando " +
-                  "y recarga la página.</p>"
-              );
-            });
-          }
-        }, true);
-      })();
-    </script>
+    <!-- Capa de repositorios (5.4) -->
+    <script src="src/repositories/placeRepository.js"></script>
+    <script src="src/repositories/embeddedPlaceRepository.js"></script>
+    <script src="src/repositories/inMemoryPlaceRepository.js"></script>
 
-    <!-- Los módulos ES son diferidos: Leaflet ya está disponible cuando arranca. -->
-    <script type="module" src="src/app/main.js"></script>
+    <!-- Capa de presentación (5.1) y funcionalidades (5.2) -->
+    <script src="src/ui/toast.js"></script>
+    <script src="src/features/map/mapView.js"></script>
+    <script src="src/features/places/placeSheet.js"></script>
+    <script src="src/features/location/whereAmI.js"></script>
+
+    <!-- Arranque -->
+    <script src="src/app/main.js"></script>
   </body>
 </html>

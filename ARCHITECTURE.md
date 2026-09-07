@@ -11,9 +11,9 @@
 >
 > | Sección | Estado en v0.2 |
 > |---------|----------------|
-> | 3 · Stack (React + TypeScript + Vite) | **Aplazado.** JavaScript con módulos ES y tipos por JSDoc. Motivo y condiciones de salida en [ADR 0002](docs/adr/0002-sin-paso-de-construccion-en-v0.2.md). |
+> | 3 · Stack (React + TypeScript + Vite) | **Aplazado.** JavaScript sin build, con tipos por JSDoc. Motivo y condiciones de salida en [ADR 0002](docs/adr/0002-sin-paso-de-construccion-en-v0.2.md) y [ADR 0005](docs/adr/0005-abrir-con-doble-clic-sin-servidor.md). |
 > | 5 · Capas | **Implementado.** `src/repositories`, `src/services`, `src/features`, `src/ui`. |
-> | 7 · Persistencia v0.1 (`places.json`) | **Implementado.** `public/data/places.json` + `JsonPlaceRepository`. |
+> | 7 · Persistencia v0.1 (JSON estático) | **Implementado con una variante.** Los datos viven en `public/data/places.js` —mismo contenido JSON, cargado como script— para que la página funcione sin servidor. `npm run export:json` produce el `.json` cuando hace falta. Ver [ADR 0005](docs/adr/0005-abrir-con-doble-clic-sin-servidor.md). |
 > | 8 · Modelo `Place` y estados editoriales | **Implementado y verificado** por `npm run validate` y `npm test`. |
 > | 10 · Estructura del repositorio | **Implementada parcialmente**: faltan `content/`, `supabase/` y `tests/e2e` hasta que haya algo que poner en ellos. |
 > | 11–13 · Gobierno, Git y CI | **Implementado.** Ver `CONTRIBUTING.md` y `.github/workflows/ci.yml`. |

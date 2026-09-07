@@ -15,41 +15,51 @@ conversación.** Si algo importante no está escrito aquí o en `docs/`, no exis
    cambio estructural**: varias decisiones que parecen omisiones son
    deliberadas y están justificadas ahí.
 
+## Ejecutar la herramienta
+
+**Doble clic en `index.html`.** Sin servidor y sin instalar nada. Es un
+requisito del producto, no una comodidad heredada: ver
+[ADR 0005](docs/adr/0005-abrir-con-doble-clic-sin-servidor.md). Si tu cambio lo
+rompe, el cambio está mal.
+
 ## Comandos
 
 ```bash
-npm start        # servidor de desarrollo en http://localhost:8000
-npm run validate # valida public/data/places.json
-npm test         # pruebas unitarias (node:test, sin dependencias)
+npm start         # servidor local; solo para probar desde el móvil
+npm run validate  # valida public/data/places.js
+npm test          # pruebas unitarias (node:test, sin dependencias)
 npm run typecheck # tipos con JSDoc + tsc (requiere npm install)
-npm run check    # validate + test, lo mínimo antes de un commit
+npm run check     # validate + test, lo mínimo antes de un commit
 ```
 
-`npm start`, `npm run validate` y `npm test` funcionan **sin `npm install`**:
-solo necesitan Node 20 o superior. Únicamente `typecheck` necesita las
+Todo funciona **sin `npm install`** salvo `typecheck`, que necesita las
 dependencias de desarrollo.
 
 ## Reglas que no se negocian
 
-1. **La capa de presentación no toca los datos.** Todo acceso pasa por un
-   repositorio (`src/repositories/`). Si un componente necesita `fetch`, está
-   mal planteado.
-2. **Ningún dato entra al DOM sin escapar.** Usa la plantilla `html` de
+1. **`index.html` debe seguir abriéndose con doble clic.** Nada de módulos ES,
+   nada de `fetch`, nada que exija un servidor.
+2. **Un archivo nuevo en `src/` necesita su `<script>` en `index.html`**, en la
+   posición correcta. Declara sus dependencias en la cabecera con la línea
+   `Depende de:`; una prueba comprueba que el orden las respete.
+3. **La capa de presentación no toca los datos.** Todo acceso pasa por un
+   repositorio (`src/repositories/`).
+4. **Ningún dato entra al DOM sin escapar.** Usa la plantilla `html` de
    `src/utils/html.js` o `textContent`. Ver [ADR 0003](docs/adr/0003-escapado-html-en-las-fichas.md).
-3. **Los servicios de `geoService.js` son funciones puras.** Nada de DOM,
+5. **Los servicios de `geoService.js` son funciones puras.** Nada de DOM,
    `navigator` ni `localStorage`; eso vive en `locationService.js`.
-4. **Nada se publica sin fuente.** `status: "published"` exige al menos una
+6. **Nada se publica sin fuente.** `status: "published"` exige al menos una
    entrada en `sources`. Lo verifica `npm run validate`.
-5. **No inventes contenido histórico.** Si no puedes citar de dónde sale un
+7. **No inventes contenido histórico.** Si no puedes citar de dónde sale un
    dato, déjalo en `status: "review"` y anótalo en
    `docs/product/contenido-por-verificar.md`.
-6. **Ningún secreto en Git.** Ver `SECURITY.md` y la sección 14 de la
+8. **Ningún secreto en Git.** Ver `SECURITY.md` y la sección 14 de la
    arquitectura.
-7. **Una decisión estructural sin ADR no se integra.** Ver [ADR 0001](docs/adr/0001-registro-de-decisiones-de-arquitectura.md).
+9. **Una decisión estructural sin ADR no se integra.** Ver [ADR 0001](docs/adr/0001-registro-de-decisiones-de-arquitectura.md).
 
 ## Añadir un lugar
 
-1. Edita `public/data/places.json`, copiando la forma de una entrada existente.
+1. Edita `public/data/places.js`, copiando la forma de una entrada existente.
 2. `id` y `slug` en kebab-case, sin tildes ni espacios: `casa-de-narino`.
 3. Color hexadecimal de seis dígitos, de la paleta de `src/styles/tokens.css`, y
    distinto al de los demás lugares publicados. Emoji también distinto.
@@ -64,13 +74,14 @@ aparecerá en el mapa, pero queda versionado y listo para promover.
 
 | Necesitas… | Va en |
 |---|---|
-| Cambiar un texto o añadir un lugar | `public/data/places.json` |
+| Cambiar un texto o añadir un lugar | `public/data/places.js` |
 | Cálculo geográfico | `src/services/geoService.js` (puro) |
 | Algo del dispositivo (GPS, almacenamiento) | `src/services/locationService.js` |
 | Nueva fuente de datos | `src/repositories/` con la interfaz de `placeRepository.js` |
 | Algo del mapa | `src/features/map/mapView.js` (único archivo que conoce Leaflet) |
 | Algo de la ficha | `src/features/places/placeSheet.js` |
 | Constante o URL | `src/app/config.js` |
+| Un archivo nuevo | `src/…` **y** su `<script>` en `index.html` |
 | Color | `src/styles/tokens.css` — nunca un literal en otro CSS |
 
 ## Reparto de roles (sección 17 de `ARCHITECTURE.md`)
@@ -91,4 +102,5 @@ sección 11.
 - [ ] Si cambiaste el comportamiento, hay una prueba que lo demuestra.
 - [ ] Si cambiaste la estructura, hay un ADR.
 - [ ] `CHANGELOG.md` actualizado.
-- [ ] Lo verificaste en el navegador, no solo en la terminal.
+- [ ] Lo verificaste **abriendo `index.html` con doble clic**, no solo con
+      `npm start` ni solo en la terminal.

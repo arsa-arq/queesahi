@@ -1,7 +1,14 @@
 # ADR 0002 — Aplazar React + TypeScript + Vite hasta la v0.4
 
 - **Fecha:** 2026-09-05
-- **Estado:** aceptada
+- **Estado:** aceptada, con una corrección posterior
+- **Corregida por:** [ADR 0005](0005-abrir-con-doble-clic-sin-servidor.md)
+
+> **Corrección (2026-09-07).** Este ADR acertó al aplazar React, pero al elegir
+> módulos ES rompió sin querer una propiedad del producto: poder abrir
+> `index.html` con doble clic. El ADR 0005 la restituye sustituyendo los módulos
+> por scripts clásicos. Todo lo que sigue vale, salvo las menciones a módulos ES
+> y a `fetch`.
 
 ## Contexto
 
@@ -53,7 +60,8 @@ primera de estas:
 ## Consecuencias
 
 - El proyecto arranca con `npm start` y solo Node instalado; sin `npm install`
-  para ver la aplicación funcionando.
+  para ver la aplicación funcionando. (Desde el ADR 0005, ni siquiera eso: basta
+  el doble clic.)
 - Los archivos `.js` con JSDoc se convierten en `.ts` casi literalmente: los
   `@typedef` pasan a `interface` y los `@param` a firmas.
 - Se pierden JSX y el ecosistema de componentes. Aceptable mientras la interfaz

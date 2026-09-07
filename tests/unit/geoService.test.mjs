@@ -1,13 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import {
-  distanceMeters,
-  formatDistance,
-  nearest,
-  sortByDistance,
-  within
-} from "../../src/services/geoService.js";
+import { geoService } from "../helpers/loadApp.mjs";
+
+const { distanceMeters, formatDistance, nearest, sortByDistance, within } = geoService;
 
 /** Plaza de Bolívar y Museo del Oro: unos 470 m en línea recta. */
 const PLAZA = { latitude: 4.59808, longitude: -74.07605 };

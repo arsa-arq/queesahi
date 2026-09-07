@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Validador de public/data/places.json.
+ * Validador de public/data/places.js.
  *
  * Existe por una razón concreta: los defectos que llegaron a producción en la
  * versión anterior eran todos detectables por una máquina —un color escrito
@@ -14,15 +14,15 @@
  * Sale con código 1 si hay errores. Los avisos no rompen la construcción.
  */
 
-import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
+import "../src/app/namespace.js";
+import "../src/types/place.js";
+import "../src/utils/html.js";
+import "../public/data/places.js";
 
-import { PLACE_STATUSES } from "../src/types/place.js";
-import { isHexColor } from "../src/utils/html.js";
+const { PLACE_STATUSES } = globalThis.QEA.types;
+const { isHexColor } = globalThis.QEA.html;
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const DATA_FILE = resolve(ROOT, "public/data/places.json");
+const DATA_FILE = "public/data/places.js";
 
 /** Caja aproximada de Bogotá D.C. Fuera de aquí, la coordenada está mal. */
 const BOGOTA_BOUNDS = { minLat: 4.4, maxLat: 4.9, minLon: -74.3, maxLon: -73.95 };
@@ -197,13 +197,10 @@ function validateCollection(places) {
   }
 }
 
-async function main() {
-  let document;
-  try {
-    document = JSON.parse(await readFile(DATA_FILE, "utf8"));
-  } catch (error) {
-    const reason = error instanceof Error ? error.message : String(error);
-    console.error(`No se pudo leer ${DATA_FILE}: ${reason}`);
+function main() {
+  const document = globalThis.__QEA_PLACES__;
+  if (document === undefined) {
+    console.error(`${DATA_FILE} no define __QEA_PLACES__.`);
     process.exit(1);
   }
 

@@ -26,7 +26,7 @@ trabajo lo harán personas centradas en la historia de Bogotá, no en JSON.
 
 ## Decisión
 
-`scripts/validate-places.mjs` valida `public/data/places.json` en cada Pull
+`scripts/validate-places.mjs` valida `public/data/places.js` en cada Pull
 Request. Comprueba, como **errores** que rompen la construcción:
 
 - campos obligatorios presentes y no vacíos;

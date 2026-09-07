@@ -8,16 +8,15 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 
-import { parsePlacesDocument } from "../../src/repositories/jsonPlaceRepository.js";
-import { PLACE_STATUSES } from "../../src/types/place.js";
-import { isHexColor } from "../../src/utils/html.js";
+import { embeddedPlaceRepository, html, types } from "../helpers/loadApp.mjs";
+import "../../public/data/places.js";
 
-const document = JSON.parse(
-  await readFile(new URL("../../public/data/places.json", import.meta.url), "utf8")
-);
-const places = parsePlacesDocument(document);
+const { parsePlacesDocument } = embeddedPlaceRepository;
+const { isHexColor } = html;
+const { PLACE_STATUSES } = types;
+
+const places = parsePlacesDocument(globalThis.__QEA_PLACES__);
 
 test("hay lugares publicados", () => {
   assert.ok(places.filter((p) => p.status === "published").length >= 5);

@@ -1,4 +1,19 @@
-{
+/**
+ * Capa de persistencia (sección 5.5 de ARCHITECTURE.md).
+ *
+ * Es un archivo .js y no .json por una razón concreta: el navegador bloquea
+ * `fetch` cuando la página se abre con doble clic (protocolo file://), pero sí
+ * ejecuta un <script> normal. Guardar los datos aquí es lo que permite que la
+ * herramienta se abra sin servidor ni instalación. Ver docs/adr/0005.
+ *
+ * El contenido es un objeto JSON puro: para exportarlo a places.json de verdad
+ * —para cargarlo en Supabase, por ejemplo— basta `npm run export:json`.
+ *
+ * NO edites la estructura sin leer antes docs/product/criterios-editoriales.md
+ * y AGENTS.md. Después de cualquier cambio: `npm run check`.
+ */
+
+globalThis.__QEA_PLACES__ = {
   "schemaVersion": 1,
   "updatedAt": "2026-09-05",
   "places": [
@@ -17,7 +32,11 @@
       "latitude": 4.59808,
       "longitude": -74.07605,
       "location": "La Candelaria, Bogotá D.C.",
-      "categories": ["Historia", "Política", "Espacio público"],
+      "categories": [
+        "Historia",
+        "Política",
+        "Espacio público"
+      ],
       "images": [],
       "sources": [
         "Instituto Distrital de Patrimonio Cultural (IDPC)",
@@ -42,9 +61,16 @@
       "latitude": 4.60193,
       "longitude": -74.07216,
       "location": "Carrera 6 con calle 16, La Candelaria, Bogotá D.C.",
-      "categories": ["Museo", "Arqueología", "Cultura"],
+      "categories": [
+        "Museo",
+        "Arqueología",
+        "Cultura"
+      ],
       "images": [],
-      "sources": ["Museo del Oro — Banco de la República", "ICANH"],
+      "sources": [
+        "Museo del Oro — Banco de la República",
+        "ICANH"
+      ],
       "status": "published",
       "createdAt": "2026-08-29",
       "updatedAt": "2026-08-29"
@@ -64,9 +90,16 @@
       "latitude": 4.6057,
       "longitude": -74.0562,
       "location": "Cerros orientales, Bogotá D.C.",
-      "categories": ["Religión", "Mirador", "Naturaleza"],
+      "categories": [
+        "Religión",
+        "Mirador",
+        "Naturaleza"
+      ],
       "images": [],
-      "sources": ["Corporación Cerro de Monserrate", "IDPC"],
+      "sources": [
+        "Corporación Cerro de Monserrate",
+        "IDPC"
+      ],
       "status": "published",
       "createdAt": "2026-08-29",
       "updatedAt": "2026-08-29"
@@ -86,9 +119,16 @@
       "latitude": 4.59723,
       "longitude": -74.07444,
       "location": "Calle 10 # 5-32, La Candelaria, Bogotá D.C.",
-      "categories": ["Patrimonio", "Arte", "Música"],
+      "categories": [
+        "Patrimonio",
+        "Arte",
+        "Música"
+      ],
       "images": [],
-      "sources": ["Ministerio de las Culturas — Teatro Colón", "IDPC"],
+      "sources": [
+        "Ministerio de las Culturas — Teatro Colón",
+        "IDPC"
+      ],
       "status": "published",
       "createdAt": "2026-08-29",
       "updatedAt": "2026-08-29"
@@ -108,9 +148,16 @@
       "latitude": 4.59662,
       "longitude": -74.0713,
       "location": "Callejón del Embudo, La Candelaria, Bogotá D.C.",
-      "categories": ["Historia", "Fundación", "Vida urbana"],
+      "categories": [
+        "Historia",
+        "Fundación",
+        "Vida urbana"
+      ],
       "images": [],
-      "sources": ["IDPC", "Alcaldía Local de La Candelaria"],
+      "sources": [
+        "IDPC",
+        "Alcaldía Local de La Candelaria"
+      ],
       "status": "published",
       "createdAt": "2026-08-29",
       "updatedAt": "2026-08-29"
@@ -130,12 +177,18 @@
       "latitude": 4.598117,
       "longitude": -74.077428,
       "location": "Calle 10, La Candelaria, Bogotá D.C.",
-      "categories": ["Historia", "Patrimonio", "Investigación"],
+      "categories": [
+        "Historia",
+        "Patrimonio",
+        "Investigación"
+      ],
       "images": [],
-      "sources": ["Academia Colombiana de Historia"],
+      "sources": [
+        "Academia Colombiana de Historia"
+      ],
       "status": "published",
       "createdAt": "2026-08-29",
       "updatedAt": "2026-09-05"
     }
   ]
-}
+};
