@@ -1,0 +1,54 @@
+/* =========================================================================
+   Identidad de marca — ¿Qué es ahí?
+   Fuente: PDF «Paleta de Colores y Logo».
+
+   Este archivo es la única definición de la paleta. Ningún otro CSS debería
+   escribir un color literal: si un tono no está aquí, es que no es de marca.
+   ========================================================================= */
+
+:root {
+  /* --- Paleta oficial --- */
+  --brand-blue: #04437f; /* azul principal: logo, acciones, marcador de usuario */
+  --brand-blue-deep: #04305c; /* azul profundo: fondos y telones */
+  --brand-red: #c74a2c;
+  --brand-orange: #e0951e;
+  --brand-green: #7c8b4a;
+  --brand-teal: #05707f;
+  --brand-indigo: #3c5393;
+
+  /* --- Roles de superficie --- */
+  --bg: var(--brand-blue-deep);
+  --surface: #ffffff;
+  --surface-2: #eef2f6;
+  --surface-3: #e7eff7;
+  --text: #0f2036;
+  --text-soft: #4a5b70;
+  --text-on-dark: #dbe8f4;
+  --text-on-dark-soft: #bcd4e8;
+  --line: #dde5ec;
+
+  /* --- Acciones --- */
+  --accent: var(--brand-blue);
+  --accent-ink: #ffffff;
+  --disabled: #94a3b8;
+
+  /* --- Forma --- */
+  --radius: 18px;
+  --radius-lg: 22px;
+  --shadow: 0 10px 40px rgba(4, 48, 92, 0.28);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+
+  /* --- Cinta de acento: los cinco colores de la paleta en orden --- */
+  --palette-ribbon: linear-gradient(
+    90deg,
+    var(--brand-red) 0 20%,
+    var(--brand-orange) 20% 40%,
+    var(--brand-green) 40% 60%,
+    var(--brand-teal) 60% 80%,
+    var(--brand-indigo) 80% 100%
+  );
+
+  /* --- Tipografía --- */
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}

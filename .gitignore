@@ -1,0 +1,26 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+build/
+.vite/
+
+# Entorno y secretos (ARCHITECTURE.md, seccion 14)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Temporales
+*.log
+npm-debug.log*
+coverage/

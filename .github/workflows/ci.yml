@@ -1,0 +1,74 @@
+# Integración continua — sección 13 de ARCHITECTURE.md
+#
+# Si alguna validación falla, el cambio no se integra.
+#
+# El orden importa: primero el contenido (es lo que más cambia y lo más barato
+# de comprobar), luego las pruebas y por último los tipos, que es el único paso
+# que necesita instalar dependencias.
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    name: Validar, probar y tipar
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["20", "22"]
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      # Sin dependencias: comprueba de paso que el proyecto arranca en una
+      # máquina limpia, que es el compromiso del ADR 0002.
+      - name: Validar el contenido
+        run: npm run validate
+
+      - name: Pruebas unitarias
+        run: npm test
+
+      - name: Instalar dependencias de desarrollo
+        run: npm install --no-audit --no-fund
+
+      - name: Verificar tipos
+        run: npm run typecheck
+
+  arranque:
+    name: El servidor de desarrollo levanta
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Barato y atrapa el fallo más tonto posible: que la aplicación no sirva.
+      - name: Levantar y pedir la página y los datos
+        run: |
+          npm start -- 8000 &
+          for i in $(seq 1 20); do
+            curl -sf http://localhost:8000/ > /dev/null && break
+            sleep 0.5
+          done
+          curl -sf http://localhost:8000/ > /dev/null
+          curl -sf http://localhost:8000/public/data/places.json > /dev/null
+          curl -sf http://localhost:8000/src/app/main.js > /dev/null
+          echo "La aplicación responde."

@@ -1,76 +1,118 @@
-# ¿Qué es ahí? — v0.1 (página única autónoma)
+# ¿Qué es ahí? / ¿What's there?
 
-Prototipo de exploración urbana geolocalizada para el centro histórico de Bogotá,
-alineado con `ARQUITECTURA_QUE_ES_AHI.md`.
+Exploración urbana geolocalizada del centro histórico de Bogotá. Abres el mapa,
+pulsas **«¿Qué es ahí?»** y la aplicación te cuenta qué es el lugar que tienes
+más cerca: qué pasó allí, por qué importa y qué mirar cuando estés delante.
 
-## Cómo usarlo
+Proyecto de la Cátedra Bogotá. Versión **0.2**.
 
-Abre `index.html` en un navegador (doble clic) o sírvelo:
+## Ejecutarlo
+
+Necesitas [Node.js](https://nodejs.org) 20 o superior. Nada más.
 
 ```bash
-python -m http.server 8000
+npm start
 ```
 
-Y entra a http://localhost:8000
+Y abre <http://localhost:8000>.
 
-Requiere conexión a internet para las teselas de OpenStreetMap y la librería
-Leaflet (cargada por CDN). El botón **«¿Qué es ahí?»** pide permiso de ubicación
-y muestra el punto de interés más cercano.
+> **No abras `index.html` con doble clic.** La aplicación usa módulos ES y carga
+> los datos con `fetch`; el navegador bloquea las dos cosas bajo el protocolo
+> `file://`. Hace falta un servidor, aunque sea el de una línea de arriba.
+
+Se necesita conexión a internet para las teselas de OpenStreetMap y para
+Leaflet, que se cargan por CDN.
+
+## Comandos
+
+| Comando | Qué hace |
+|---|---|
+| `npm start` | Servidor de desarrollo en el puerto 8000 (`npm start -- 3000` para otro). |
+| `npm run validate` | Revisa `public/data/places.json`: campos, coordenadas, duplicados, fuentes. |
+| `npm test` | Pruebas unitarias. Sin dependencias: usa el `node:test` incorporado. |
+| `npm run typecheck` | Verifica los tipos JSDoc con TypeScript. Requiere `npm install`. |
+| `npm run check` | `validate` + `test`. Lo mínimo antes de proponer un cambio. |
 
 ## Qué incluye
 
-- Mapa Leaflet + OpenStreetMap, mobile-first.
-- Identidad de marca del PDF *Paleta de Colores y Logo*: logo (pin + «?» sobre
-  olas), nombre bilingüe **¿Qué es ahí? / ¿What's there?** y la paleta oficial.
-- 5 puntos de interés de Bogotá con ficha editorial (Plaza de Bolívar, Museo del
-  Oro, Cerro de Monserrate, Teatro Colón, Chorro de Quevedo). Cada lugar usa uno
-  de los cinco colores de acento de la paleta.
-- Geolocalización con cálculo de distancia (Haversine) y búsqueda por proximidad.
-- Última posición conocida guardada en `localStorage` (guiño a *local-first*).
-- Estados de carga y error.
+- Mapa Leaflet + OpenStreetMap, pensado primero para el móvil.
+- Seis lugares del centro histórico con ficha editorial: Plaza de Bolívar, Museo
+  del Oro, Cerro de Monserrate, Teatro Colón, Chorro de Quevedo y Academia
+  Colombiana de Historia.
+- Botón **«¿Qué es ahí?»**: geolocaliza, calcula distancias (Haversine) y abre
+  la ficha del lugar más cercano.
+- Enlaces compartibles por lugar: `…/#/lugar/plaza-de-bolivar`. El botón
+  «atrás» del navegador cierra la ficha.
+- Última posición conocida guardada en `localStorage`, para responder aunque el
+  GPS falle (primer gesto *local-first*).
+- Estados de carga y error con mensajes que dicen qué hacer.
+- Identidad de marca del PDF *Paleta de Colores y Logo*.
 
-## Paleta de colores (marca)
+## Estructura
 
-| Rol                    | Hex        | Uso en la app                                  |
-|------------------------|------------|------------------------------------------------|
-| Azul principal         | `#04437F`  | Logo, cabecera, botón, marcador de usuario     |
-| Azul profundo (fondo)  | `#04305C`  | Fondo, toasts, telón de la ficha               |
-| Rojo ladrillo          | `#C74A2C`  | Acento — Plaza de Bolívar                      |
-| Naranja ámbar          | `#E0951E`  | Acento — Museo del Oro                         |
-| Verde oliva            | `#7C8B4A`  | Acento — Cerro de Monserrate                   |
-| Teal                   | `#05707F`  | Acento — Chorro de Quevedo, títulos de sección |
-| Índigo                 | `#3C5393`  | Acento — Teatro Colón                          |
+```text
+que-es-ahi/
+├── index.html              solo el esqueleto; ni estilos ni lógica
+├── public/data/places.json los datos (capa de persistencia, v0.2)
+├── src/
+│   ├── app/                config.js y main.js — el único sitio que conecta capas
+│   ├── repositories/       acceso a datos (JSON hoy; IndexedDB y Supabase después)
+│   ├── services/           geoService.js (puro) y locationService.js (dispositivo)
+│   ├── features/           map/, places/, location/
+│   ├── ui/                 componentes sueltos (toast)
+│   ├── types/              modelo Place en JSDoc
+│   ├── utils/              html.js — escapado seguro
+│   └── styles/             tokens.css (marca) y app.css
+├── scripts/                serve.mjs y validate-places.mjs
+├── tests/unit/             pruebas
+└── docs/adr/               por qué el código es como es
+```
 
-Definidos como variables CSS (`--brand-*`) al inicio de `index.html`. Los cinco
-colores de acento aparecen juntos en la cinta bajo la cabecera y al pie del
-banner de cada ficha.
+La correspondencia con las capas de `ARCHITECTURE.md` es directa: presentación
+(5.1) en `features/` y `ui/`, funcionalidades (5.2) en `features/`, servicios
+(5.3) en `services/`, repositorios (5.4) en `repositories/` y persistencia (5.5)
+en `public/data/`. **La presentación nunca accede a los datos directamente.**
 
-## Recursos
+## Paleta de marca
 
-- `logo.png` — logo con fondo transparente (extraído del PDF).
-- `favicon.png` — icono de pestaña 64×64.
+Definida como variables CSS en `src/styles/tokens.css`. Ningún otro archivo
+escribe un color literal.
 
-## Relación con la arquitectura del documento
+| Rol | Hex | Uso |
+|---|---|---|
+| Azul principal | `#04437F` | Logo, botón, marcador de usuario, Academia Colombiana de Historia |
+| Azul profundo | `#04305C` | Fondo, avisos, telón de la ficha |
+| Rojo ladrillo | `#C74A2C` | Plaza de Bolívar |
+| Naranja ámbar | `#E0951E` | Museo del Oro |
+| Verde oliva | `#7C8B4A` | Cerro de Monserrate |
+| Teal | `#05707F` | Chorro de Quevedo, títulos de sección |
+| Índigo | `#3C5393` | Teatro Colón |
 
-Todo vive en un solo archivo, pero el JavaScript conserva la separación por capas
-de las secciones 5 y 6 del documento:
+Los cinco acentos aparecen juntos en la cinta bajo la cabecera y al pie del
+banner de cada ficha. Cada lugar publicado usa un color y un emoji distintos;
+`npm run validate` avisa si se repiten.
 
-| Capa (documento)        | En este archivo                                  |
-|-------------------------|--------------------------------------------------|
-| Persistencia (5.5)      | `PLACES_DATA` — modelo `Place` de la sección 8   |
-| Repositorios (5.4)      | `InMemoryPlaceRepository` con `getAll` / `getById` |
-| Servicios (5.3)         | `GeoService` — distancias, geolocalización, `nearest` |
-| Presentación (5.1)      | `UI` — mapa, marcadores, ficha, toasts           |
+## Añadir un lugar
 
-Para pasar a la v0.1 "real" del documento (React + TypeScript + Vite), estos
-mismos bloques se trasladan a `src/repositories`, `src/services` y
-`src/features`, y `PLACES_DATA` pasa a `public/data/places.json`. La interfaz del
-repositorio no cambia, así que la fuente de datos puede migrar luego a IndexedDB
-o Supabase sin tocar la presentación.
+Ver [`AGENTS.md`](AGENTS.md). En resumen: editar `public/data/places.json`,
+`npm run check`, y Pull Request.
 
-## Pendiente para versiones siguientes
+## Documentación
 
-- Migrar a React + TS + Vite y a la estructura de carpetas de la sección 10.
-- `places.json` externo + `JsonPlaceRepository`.
-- IndexedDB (v0.3), PWA / service worker (v0.5), Supabase + PostGIS (v0.6).
-- Descargar Leaflet como dependencia local en lugar de CDN.
+| Archivo | Para qué |
+|---|---|
+| [`AGENTS.md`](AGENTS.md) | Cómo trabajar aquí. **Empieza por aquí si eres nuevo.** |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | El diseño y su estado de implementación. |
+| [`ROADMAP.md`](ROADMAP.md) | Qué viene y qué condiciones lo disparan. |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Ramas, commits, Pull Requests. |
+| [`SECURITY.md`](SECURITY.md) | Secretos, dependencias, datos personales. |
+| [`CHANGELOG.md`](CHANGELOG.md) | Qué cambió en cada versión. |
+| [`docs/adr/`](docs/adr/) | Por qué el código es como es. |
+| [`docs/product/`](docs/product/) | Criterios editoriales y contenido pendiente. |
+
+## Estado
+
+La v0.2 aplaza a propósito React + TypeScript + Vite, que la arquitectura pide
+para la v0.1. El motivo y las condiciones para migrar están en el
+[ADR 0002](docs/adr/0002-sin-paso-de-construccion-en-v0.2.md): la separación en
+capas ya está hecha en archivos reales, así que la migración será mecánica.

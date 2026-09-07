@@ -1,0 +1,22 @@
+{
+  "//": "Verificación de tipos sobre JavaScript con JSDoc (npm run typecheck). Permite el rigor de TypeScript sin añadir un paso de compilación; ver docs/adr/0002.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "checkJs": true,
+    "allowJs": true,
+    "noEmit": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "//include": "Las pruebas quedan fuera a propósito: usan fixtures parciales de Place para que cada caso se lea de un vistazo, y su corrección la garantiza `npm test`, no el verificador de tipos.",
+  "include": ["src/**/*.js", "scripts/**/*.mjs"],
+  "exclude": ["node_modules"]
+}
