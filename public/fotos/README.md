@@ -53,11 +53,39 @@ Ejemplo de la entrada resultante:
 Menos de 300 kB por imagen: la herramienta se usa en la calle, con datos
 móviles.
 
-**Tamaño.** Alrededor de 1200 × 630 px. La ficha recorta al centro, así que lo
-importante debe quedar hacia el medio.
+**Tamaño.** **1600 × 840 px** es el objetivo. Mínimo aceptable: 1200 × 630.
 
-**Encuadre.** Horizontal. La franja inferior queda cubierta por un degradado
-oscuro y el nombre del lugar; no pongas ahí nada que importe.
+Ese número sale de medir la ficha en pantalla, no de una convención. El
+encabezado mide siempre 210 px de alto en CSS, pero su ancho depende del
+dispositivo, y las pantallas modernas piden dos o tres píxeles reales por cada
+píxel CSS:
+
+| Dispositivo | Caja en pantalla | Proporción | Píxeles reales |
+|---|---|---|---|
+| Móvil 390 px | 390 × 210 | 1.86 : 1 | 780 × 420 |
+| Móvil grande 430 px | 430 × 210 | 2.05 : 1 | 1290 × 630 |
+| Tablet 768 px | 768 × 210 | 3.66 : 1 | 1536 × 420 |
+| Escritorio | 400 × 210 | 1.90 : 1 | 800 × 420 |
+| Pantalla baja | 400 × 150 | 2.67 : 1 | 800 × 300 |
+
+El caso más exigente en ancho es la tablet (1536 px) y el más exigente en alto
+el móvil grande (630 px). Con 1600 × 840 se cubren todos sin que el navegador
+tenga que ampliar la imagen.
+
+No hace falta que sea exacto: cualquier foto horizontal grande sirve, mientras
+se respete el encuadre de abajo.
+
+**Encuadre.** Horizontal, y esta es la parte que de verdad importa.
+
+La imagen se recorta al centro (`object-fit: cover`) y la proporción cambia
+entre **1.86 : 1 y 3.66 : 1** según el dispositivo. En una tablet el recorte es
+muy panorámico: solo sobrevive una franja horizontal del centro.
+
+- Deja el motivo principal **en la banda central**, tanto en horizontal como en
+  vertical.
+- La franja inferior —cerca de un tercio— queda bajo un degradado oscuro con el
+  nombre del lugar encima. No pongas ahí nada que importe.
+- Evita composiciones altas: una torre encuadrada en vertical se decapita.
 
 **Derechos.** Este es el punto que no se negocia. Solo entran aquí:
 
