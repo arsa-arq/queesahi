@@ -39,7 +39,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "images": [
         {
-          "src": "public/fotos/plaza-de-bolivar.svg",
+          "src": "public/fotos/plaza-de-bolivar.png",
           "alt": "Marcador de posición: fondo rojo ladrillo con el emoji de un edificio clásico y el nombre del lugar.",
           "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
         }
@@ -74,7 +74,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "images": [
         {
-          "src": "public/fotos/museo-del-oro.svg",
+          "src": "public/fotos/museo-del-oro.png",
           "alt": "Marcador de posición: fondo naranja ámbar con el emoji de una moneda y el nombre del lugar.",
           "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
         }
@@ -109,7 +109,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "images": [
         {
-          "src": "public/fotos/cerro-de-monserrate.svg",
+          "src": "public/fotos/cerro-de-monserrate.png",
           "alt": "Marcador de posición: fondo verde oliva con el emoji de una montaña y el nombre del lugar.",
           "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
         }
@@ -144,7 +144,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "images": [
         {
-          "src": "public/fotos/teatro-colon.svg",
+          "src": "public/fotos/teatro-colon.png",
           "alt": "Marcador de posición: fondo índigo con el emoji de dos máscaras de teatro y el nombre del lugar.",
           "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
         }
@@ -179,7 +179,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "images": [
         {
-          "src": "public/fotos/chorro-de-quevedo.svg",
+          "src": "public/fotos/chorro-de-quevedo.png",
           "alt": "Marcador de posición: fondo teal con el emoji de una fuente y el nombre del lugar.",
           "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
         }
@@ -214,7 +214,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "images": [
         {
-          "src": "public/fotos/academia-colombiana-de-historia.svg",
+          "src": "public/fotos/academia-colombiana-de-historia.png",
           "alt": "Marcador de posición: fondo azul con el emoji de unos libros y el nombre del lugar.",
           "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
         }

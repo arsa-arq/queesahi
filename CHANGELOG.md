@@ -2,6 +2,30 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.3] — 2026-09-08
+
+### Corregido
+
+- **Los marcadores de posición pasan de SVG a PNG.** El Explorador de Windows
+  no genera miniaturas de SVG, así que `public/fotos/` parecía no tener
+  imágenes: seis archivos con icono genérico. En PNG se ven en la miniatura, en
+  la vista previa y en cualquier visor, igual que se verán las fotografías
+  reales.
+- Los marcadores usan color plano en vez de degradado. El degradado obligaba al
+  PNG a tramar y los dejaba en 175–324 kB cada uno, por encima del límite que el
+  propio `public/fotos/README.md` fija para las fotografías. Ahora rondan los
+  25 kB: 160 kB en total en vez de 1,6 MB.
+
+### Cambiado
+
+- `npm run fotos:placeholders` dibuja las imágenes con el navegador instalado
+  (Chrome o Edge) en modo sin interfaz. Es una dependencia solo de ese script:
+  los PNG se versionan, así que nadie necesita ejecutarlo para ver la
+  herramienta.
+- El script identifica sus propios archivos mediante `public/fotos/.marcadores.json`
+  en vez de una marca dentro del archivo, que en un binario no cabía. Sigue sin
+  sobrescribir nunca una fotografía real.
+
 ## [0.2.2] — 2026-09-08
 
 ### Añadido

@@ -11,20 +11,28 @@ pendiente». Están para que la ficha se pueda ver y probar mientras se consigue
 las fotos de verdad, y son deliberadamente inconfundibles para que nadie las dé
 por buenas en una demostración.
 
-Las genera `npm run fotos:placeholders`. Ese script **nunca sobrescribe una
-fotografía real**: reconoce sus propios archivos por una marca interna y respeta
-todo lo demás.
+Son PNG y pesan unos 25 kB cada uno. Se ven en la miniatura del Explorador de
+Windows, en la vista previa y en cualquier visor, igual que se verán las
+fotografías reales.
+
+Las genera `npm run fotos:placeholders`, que las dibuja con el navegador que
+tengas instalado (Chrome o Edge). Ese script **nunca sobrescribe una fotografía
+real**: solo toca los archivos que él mismo anotó en `.marcadores.json`, y
+respeta todo lo demás.
+
+No hace falta ejecutarlo para ver la herramienta: los PNG están versionados.
 
 ## Cómo poner una fotografía de verdad
 
 1. Guarda la imagen aquí con el `slug` del lugar como nombre:
    `plaza-de-bolivar.jpg`.
 2. Abre `public/data/places.js`, busca ese lugar y cambia la extensión en
-   `images[0].src`, de `.svg` a `.jpg`.
+   `images[0].src`, de `.png` a `.jpg`.
 3. Escribe un `alt` que describa lo que se ve, no el nombre del lugar. Es
    obligatorio: `npm run validate` falla si falta.
 4. Rellena `credit` con autoría y licencia.
-5. Borra el marcador de posición `plaza-de-bolivar.svg`.
+5. Borra el marcador de posición `plaza-de-bolivar.png` y quita su nombre de
+   `.marcadores.json`.
 6. `npm run check`.
 
 Ejemplo de la entrada resultante:

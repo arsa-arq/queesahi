@@ -1,0 +1,12 @@
+{
+  "//": "Archivos que generó scripts/generate-placeholders.mjs. Se pueden sobrescribir. Cualquier otra imagen de esta carpeta se respeta.",
+  "generadoEl": "2026-09-08",
+  "generados": [
+    "plaza-de-bolivar.png",
+    "museo-del-oro.png",
+    "cerro-de-monserrate.png",
+    "teatro-colon.png",
+    "chorro-de-quevedo.png",
+    "academia-colombiana-de-historia.png"
+  ]
+}

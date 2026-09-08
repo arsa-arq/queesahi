@@ -94,9 +94,10 @@ Cada lugar tiene una imagen en `public/fotos/`, con el `slug` como nombre. Se
 muestra fija en la parte superior de la ficha y el texto pasa por debajo al
 desplazarse.
 
-**Las que hay ahora son marcadores de posición, no fotografías.** Llevan escrito
-«Fotografía pendiente» para que nadie las confunda con material real. El flujo
-para sustituirlas —y los requisitos de licencia, que no son negociables— está en
+**Las que hay ahora son marcadores de posición, no fotografías.** Son PNG con
+el color del lugar, su emoji y la palabra «Fotografía pendiente», para que nadie
+las confunda con material real. El flujo para sustituirlas —y los requisitos de
+licencia, que no son negociables— está en
 [`public/fotos/README.md`](public/fotos/README.md).
 
 Si una imagen falta o no carga, la ficha no se rompe: vuelve al encabezado con
