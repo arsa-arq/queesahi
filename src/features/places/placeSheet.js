@@ -15,7 +15,7 @@
   "use strict";
 
   const QEA = global.QEA;
-  const { html, toHtmlString } = QEA.require("html");
+  const { html, toHtmlString, firstImage } = QEA.require("html");
   const { formatDistance } = QEA.require("geoService");
   const { accentOf } = QEA.require("mapView");
 
@@ -49,6 +49,48 @@
   function block(label, text) {
     if (!text) return "";
     return html`<section class="block"><h3>${label}</h3><p>${text}</p></section>`;
+  }
+
+  /**
+   * Coloca (o retira) la fotografía del encabezado.
+   *
+   * Se construye con `createElement` en vez de `innerHTML` porque hace falta
+   * escuchar `error`: si el archivo todavía no existe —el caso normal mientras
+   * el equipo consigue las fotos— la ficha debe quedarse con el degradado de
+   * marca, nunca con el icono de imagen rota.
+   *
+   * @param {HTMLElement} banner
+   * @param {HTMLElement} sheet
+   * @param {{ src: string, alt: string }|null} image
+   * @param {string} placeName
+   */
+  function renderPhoto(banner, sheet, image, placeName) {
+    const previous = banner.querySelector(".photo");
+    if (previous) previous.remove();
+    sheet.classList.remove("with-photo");
+
+    if (!image) return;
+
+    const img = document.createElement("img");
+    img.className = "photo";
+    // Un `alt` vacío marcaría la imagen como decorativa. Si el dato no trae
+    // descripción, al menos se dice de qué lugar es.
+    img.alt = image.alt || `Fotografía de ${placeName}`;
+    img.decoding = "async";
+
+    // Se reserva el alto de la fotografía ya mismo, sin esperar al evento
+    // `load`. Hacerlo al cargar provocaba un salto visible: la ficha se abría
+    // con el encabezado corto y crecía un instante después. Si la imagen falla
+    // —lo normal mientras no haya fotos reales— se deshace aquí abajo.
+    sheet.classList.add("with-photo");
+
+    img.addEventListener("error", () => {
+      img.remove();
+      sheet.classList.remove("with-photo");
+    });
+    img.src = image.src;
+
+    banner.prepend(img);
   }
 
   /**
@@ -130,10 +172,12 @@
           (category) => html`<span class="chip">${category}</span>`
         );
         const sources = (place.sources || []).join(" · ");
+        const image = firstImage(place);
 
         title.textContent = place.name;
         emoji.textContent = place.emoji || "📍";
         banner.style.setProperty("--c", accent);
+        renderPhoto(banner, sheet, image, place.name);
 
         body.innerHTML = toHtmlString(html`
           <div class="meta">${distance}${categories}</div>
@@ -149,6 +193,9 @@
             <a class="ghost" href="${osmUrl(place)}" target="_blank" rel="noopener noreferrer">Ver en OSM</a>
           </div>
           <p class="sources"><strong>Fuentes:</strong> ${sources || "—"}</p>
+          ${image && image.credit
+            ? html`<p class="sources credit"><strong>Fotografía:</strong> ${image.credit}</p>`
+            : ""}
         `);
 
         // El cuerpo conserva el desplazamiento de la ficha anterior si no se

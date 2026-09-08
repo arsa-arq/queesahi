@@ -13,10 +13,10 @@ las cosas que aquí se automatizan.
 | Capa | Herramienta | Estado |
 |---|---|---|
 | Servicios puros (`geoService`) | `node:test` | 12 pruebas |
-| Utilidades (`html`) | `node:test` | 11 pruebas |
+| Utilidades (`html`) | `node:test` | 17 pruebas |
 | Repositorios | `node:test` con dobles del documento | 13 pruebas |
 | Orden de carga de `index.html` | `node:test` sobre el HTML | 6 pruebas |
-| Datos reales (`places.js`) | `node:test` + `validate-places.mjs` | 7 pruebas + validador |
+| Datos reales (`places.js`) | `node:test` + `validate-places.mjs` | 9 pruebas + validador |
 | Presentación (mapa, ficha) | manual, en navegador | pendiente de E2E en v0.3 |
 
 ```bash
@@ -44,7 +44,7 @@ probar con Node, sin navegador ni simuladores. Todo lo que toca el dispositivo
 —GPS, `localStorage`— vive en `locationService.js`, que es fino a propósito:
 cuanto menos código haya ahí, menos código queda sin probar.
 
-Esa frontera es la razón de que 43 pruebas cubran lo que importa sin montar un
+Esa frontera es la razón de que 57 pruebas cubran lo que importa sin montar un
 entorno de navegador.
 
 ## Los tipos son parte de las pruebas

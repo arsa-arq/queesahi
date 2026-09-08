@@ -107,6 +107,69 @@
   }
 
   /**
+   * Ruta de imagen utilizable, o cadena vacía.
+   *
+   * Acepta rutas relativas del propio proyecto (`public/fotos/x.jpg`) y URLs
+   * http(s). Rechaza cualquier cosa con esquema —`javascript:`, `data:`— y las
+   * URLs sin protocolo (`//otro-sitio/x.jpg`), que apuntarían fuera.
+   *
+   * `safeUrl` no sirve aquí porque solo admite URLs absolutas, y las fotos del
+   * proyecto son rutas locales.
+   *
+   * @param {unknown} value
+   * @returns {string}
+   */
+  function safeImageSrc(value) {
+    const text = String(value === null || value === undefined ? "" : value).trim();
+    if (!text) return "";
+    if (/^https?:\/\//i.test(text)) return text;
+    if (text.startsWith("//")) return ""; // protocolo relativo: otro origen
+    if (/^[a-z][a-z0-9+.-]*:/i.test(text)) return ""; // cualquier otro esquema
+    return text;
+  }
+
+  /**
+   * Normaliza una entrada de `images`.
+   *
+   * Admite la forma corta —una ruta suelta— y la completa, con `alt` y
+   * `credit`. La corta existe porque el modelo de la sección 8 declara
+   * `images` como lista de rutas; la completa, porque una fotografía sin
+   * descripción no es accesible y sin crédito no es publicable.
+   *
+   * @param {unknown} entry
+   * @returns {{ src: string, alt: string, credit: string }|null}
+   */
+  function normalizeImage(entry) {
+    if (typeof entry === "string") {
+      const src = safeImageSrc(entry);
+      return src ? { src, alt: "", credit: "" } : null;
+    }
+    if (entry && typeof entry === "object") {
+      const image = /** @type {Record<string, unknown>} */ (entry);
+      const src = safeImageSrc(image.src);
+      if (!src) return null;
+      return {
+        src,
+        alt: typeof image.alt === "string" ? image.alt : "",
+        credit: typeof image.credit === "string" ? image.credit : ""
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Primera imagen utilizable de un lugar, o `null`.
+   * @param {{ images?: unknown[] }} place
+   */
+  function firstImage(place) {
+    for (const entry of place.images || []) {
+      const image = normalizeImage(entry);
+      if (image) return image;
+    }
+    return null;
+  }
+
+  /**
    * Valida un color hexadecimal de seis dígitos.
    *
    * Existe porque un color escrito como `"#7C8B4A;"` —con punto y coma
@@ -121,5 +184,15 @@
     return typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value);
   }
 
-  QEA.define("html", { escapeHtml, raw, html, toHtmlString, safeUrl, isHexColor });
+  QEA.define("html", {
+    escapeHtml,
+    raw,
+    html,
+    toHtmlString,
+    safeUrl,
+    safeImageSrc,
+    normalizeImage,
+    firstImage,
+    isHexColor
+  });
 })(globalThis);

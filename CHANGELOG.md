@@ -2,6 +2,58 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.2] — 2026-09-08
+
+### Añadido
+
+- **Fotografía fija en la cabecera de cada ficha.** El encabezado se ancla
+  arriba y el cuerpo ocupa toda la ficha por debajo, reservando ese alto con un
+  `padding`. Así el texto se desliza **por detrás** de la imagen al
+  desplazarse, en vez de cortarse contra su borde. Con fotografía el encabezado
+  mide 210 px; sin ella se queda en los 118 px de antes.
+- **`public/fotos/`**, una imagen por lugar, nombrada con su `slug`. Su
+  [README](public/fotos/README.md) explica el flujo de reemplazo y los
+  requisitos de licencia.
+- **Marcadores de posición para las seis fichas.** No son fotografías: llevan
+  el color de acento del lugar, su emoji y la palabra «Fotografía pendiente»,
+  para que nadie los dé por buenos en una demostración.
+  `npm run fotos:placeholders` los genera y **nunca sobrescribe una fotografía
+  real**: reconoce sus propios archivos por una marca interna.
+- **Crédito de la imagen** al pie de la ficha, junto a las fuentes.
+- Velo degradado sobre la fotografía, para que el nombre del lugar siga siendo
+  legible sea cual sea la imagen.
+- `safeImageSrc`, `normalizeImage` y `firstImage` en `src/utils/html.js`.
+- Reglas nuevas en `npm run validate`: ruta de imagen utilizable (rechaza
+  `javascript:`, `data:` y orígenes ajenos), `alt` obligatorio en lugares
+  publicados, aviso si falta `credit` y aviso si el archivo referenciado no
+  existe.
+- 14 pruebas más (57 en total).
+
+### Cambiado
+
+- El campo `images` del modelo admite ahora, además de una ruta suelta, un
+  objeto `{ src, alt, credit }`. La forma corta se sigue aceptando: la sección 8
+  de la arquitectura declara `images` como lista de rutas.
+- Con fotografía, el emoji del encabezado se oculta: ya está en el marcador del
+  mapa, y sobre una imagen estorba.
+- El tirador de la ficha se vuelve blanco translúcido sobre la fotografía.
+
+### Detalles de implementación
+
+- El alto del encabezado se reserva **antes** de que la imagen cargue, no en su
+  evento `load`. Hacerlo al cargar abría la ficha con el encabezado corto y la
+  agrandaba un instante después, con un salto visible.
+- La imagen se inserta con `createElement`, no con `innerHTML`, porque hace
+  falta escuchar `error`: si el archivo no existe —lo normal mientras no haya
+  fotos reales— la ficha vuelve al degradado de marca en lugar de mostrar el
+  icono de imagen rota.
+
+### Pendiente
+
+Las seis imágenes son provisionales. Sustituirlas por fotografías con derechos
+comprobados es tarea del equipo editorial; está anotado en el ROADMAP y en
+`public/fotos/README.md`.
+
 ## [0.2.1] — 2026-09-07
 
 ### Corregido

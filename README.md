@@ -37,6 +37,7 @@ Y abre <http://localhost:8000>.
 | `npm test` | Pruebas unitarias. Sin dependencias: usa el `node:test` incorporado. |
 | `npm run typecheck` | Verifica los tipos JSDoc con TypeScript. Requiere `npm install`. |
 | `npm run export:json` | Exporta los datos a `places.json` para otras herramientas. |
+| `npm run fotos:placeholders` | Regenera las imágenes provisionales de `public/fotos/`. |
 | `npm run check` | `validate` + `test`. Lo mínimo antes de proponer un cambio. |
 
 ## Qué incluye
@@ -47,6 +48,8 @@ Y abre <http://localhost:8000>.
   Colombiana de Historia.
 - Botón **«¿Qué es ahí?»**: geolocaliza, calcula distancias (Haversine) y abre
   la ficha del lugar más cercano.
+- Fotografía fija en la cabecera de cada ficha: el texto se desliza por debajo
+  al desplazarse, y la imagen no se mueve.
 - Enlaces compartibles por lugar: `…/#/lugar/plaza-de-bolivar`. El botón
   «atrás» del navegador cierra la ficha.
 - Última posición conocida guardada en `localStorage`, para responder aunque el
@@ -60,6 +63,7 @@ Y abre <http://localhost:8000>.
 que-es-ahi/
 ├── index.html              esqueleto y orden de carga de los scripts
 ├── public/data/places.js   los datos (capa de persistencia, v0.2)
+├── public/fotos/           una imagen por lugar — ver su README
 ├── src/
 │   ├── app/                namespace.js, config.js y main.js
 │   ├── repositories/       acceso a datos (embebidos hoy; IndexedDB y Supabase después)
@@ -83,6 +87,20 @@ Los archivos son scripts clásicos, no módulos ES: es lo que permite el doble
 clic. A cambio, **el orden de los `<script>` en `index.html` importa**. Cada
 archivo declara de qué depende en su cabecera, y una prueba comprueba que el
 orden lo respete.
+
+## Fotografías
+
+Cada lugar tiene una imagen en `public/fotos/`, con el `slug` como nombre. Se
+muestra fija en la parte superior de la ficha y el texto pasa por debajo al
+desplazarse.
+
+**Las que hay ahora son marcadores de posición, no fotografías.** Llevan escrito
+«Fotografía pendiente» para que nadie las confunda con material real. El flujo
+para sustituirlas —y los requisitos de licencia, que no son negociables— está en
+[`public/fotos/README.md`](public/fotos/README.md).
+
+Si una imagen falta o no carga, la ficha no se rompe: vuelve al encabezado con
+el degradado de marca.
 
 ## Paleta de marca
 

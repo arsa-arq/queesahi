@@ -15,7 +15,7 @@
 
 globalThis.__QEA_PLACES__ = {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-05",
+  "updatedAt": "2026-09-08",
   "places": [
     {
       "id": "plaza-de-bolivar",
@@ -37,14 +37,20 @@ globalThis.__QEA_PLACES__ = {
         "Política",
         "Espacio público"
       ],
-      "images": [],
+      "images": [
+        {
+          "src": "public/fotos/plaza-de-bolivar.svg",
+          "alt": "Marcador de posición: fondo rojo ladrillo con el emoji de un edificio clásico y el nombre del lugar.",
+          "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
+        }
+      ],
       "sources": [
         "Instituto Distrital de Patrimonio Cultural (IDPC)",
         "Banco de la República — Red Cultural"
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-08-29"
+      "updatedAt": "2026-09-08"
     },
     {
       "id": "museo-del-oro",
@@ -66,14 +72,20 @@ globalThis.__QEA_PLACES__ = {
         "Arqueología",
         "Cultura"
       ],
-      "images": [],
+      "images": [
+        {
+          "src": "public/fotos/museo-del-oro.svg",
+          "alt": "Marcador de posición: fondo naranja ámbar con el emoji de una moneda y el nombre del lugar.",
+          "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
+        }
+      ],
       "sources": [
         "Museo del Oro — Banco de la República",
         "ICANH"
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-08-29"
+      "updatedAt": "2026-09-08"
     },
     {
       "id": "cerro-de-monserrate",
@@ -95,14 +107,20 @@ globalThis.__QEA_PLACES__ = {
         "Mirador",
         "Naturaleza"
       ],
-      "images": [],
+      "images": [
+        {
+          "src": "public/fotos/cerro-de-monserrate.svg",
+          "alt": "Marcador de posición: fondo verde oliva con el emoji de una montaña y el nombre del lugar.",
+          "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
+        }
+      ],
       "sources": [
         "Corporación Cerro de Monserrate",
         "IDPC"
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-08-29"
+      "updatedAt": "2026-09-08"
     },
     {
       "id": "teatro-colon",
@@ -124,14 +142,20 @@ globalThis.__QEA_PLACES__ = {
         "Arte",
         "Música"
       ],
-      "images": [],
+      "images": [
+        {
+          "src": "public/fotos/teatro-colon.svg",
+          "alt": "Marcador de posición: fondo índigo con el emoji de dos máscaras de teatro y el nombre del lugar.",
+          "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
+        }
+      ],
       "sources": [
         "Ministerio de las Culturas — Teatro Colón",
         "IDPC"
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-08-29"
+      "updatedAt": "2026-09-08"
     },
     {
       "id": "chorro-de-quevedo",
@@ -153,14 +177,20 @@ globalThis.__QEA_PLACES__ = {
         "Fundación",
         "Vida urbana"
       ],
-      "images": [],
+      "images": [
+        {
+          "src": "public/fotos/chorro-de-quevedo.svg",
+          "alt": "Marcador de posición: fondo teal con el emoji de una fuente y el nombre del lugar.",
+          "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
+        }
+      ],
       "sources": [
         "IDPC",
         "Alcaldía Local de La Candelaria"
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-08-29"
+      "updatedAt": "2026-09-08"
     },
     {
       "id": "academia-colombiana-de-historia",
@@ -182,13 +212,19 @@ globalThis.__QEA_PLACES__ = {
         "Patrimonio",
         "Investigación"
       ],
-      "images": [],
+      "images": [
+        {
+          "src": "public/fotos/academia-colombiana-de-historia.svg",
+          "alt": "Marcador de posición: fondo azul con el emoji de unos libros y el nombre del lugar.",
+          "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
+        }
+      ],
       "sources": [
         "Academia Colombiana de Historia"
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-05"
+      "updatedAt": "2026-09-08"
     }
   ]
 };

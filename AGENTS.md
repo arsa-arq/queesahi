@@ -50,12 +50,15 @@ dependencias de desarrollo.
    `navigator` ni `localStorage`; eso vive en `locationService.js`.
 6. **Nada se publica sin fuente.** `status: "published"` exige al menos una
    entrada en `sources`. Lo verifica `npm run validate`.
-7. **No inventes contenido histórico.** Si no puedes citar de dónde sale un
+7. **Ninguna imagen sin derechos ni sin `alt`.** Solo entran fotografías
+   propias, con licencia libre o cedidas por escrito. El `alt` es obligatorio
+   en lugares publicados.
+8. **No inventes contenido histórico.** Si no puedes citar de dónde sale un
    dato, déjalo en `status: "review"` y anótalo en
    `docs/product/contenido-por-verificar.md`.
-8. **Ningún secreto en Git.** Ver `SECURITY.md` y la sección 14 de la
+9. **Ningún secreto en Git.** Ver `SECURITY.md` y la sección 14 de la
    arquitectura.
-9. **Una decisión estructural sin ADR no se integra.** Ver [ADR 0001](docs/adr/0001-registro-de-decisiones-de-arquitectura.md).
+10. **Una decisión estructural sin ADR no se integra.** Ver [ADR 0001](docs/adr/0001-registro-de-decisiones-de-arquitectura.md).
 
 ## Añadir un lugar
 
@@ -64,8 +67,13 @@ dependencias de desarrollo.
 3. Color hexadecimal de seis dígitos, de la paleta de `src/styles/tokens.css`, y
    distinto al de los demás lugares publicados. Emoji también distinto.
 4. Cita al menos una fuente real.
-5. `npm run check`. Corrige errores y lee los avisos.
-6. Rama `feature/lugar-<slug>`, Pull Request, y a revisión.
+5. Añade su fotografía en `public/fotos/<slug>.jpg` y rellena `images[0]` con
+   `src`, `alt` y `credit`. Sin `alt` el validador falla; sin derechos de uso
+   comprobados, la imagen no entra. Ver
+   [`public/fotos/README.md`](public/fotos/README.md).
+   Mientras no haya foto: `npm run fotos:placeholders` genera un provisional.
+6. `npm run check`. Corrige errores y lee los avisos.
+7. Rama `feature/lugar-<slug>`, Pull Request, y a revisión.
 
 Si el contenido aún no está verificado, ponlo en `status: "review"`: no
 aparecerá en el mapa, pero queda versionado y listo para promover.
@@ -75,6 +83,7 @@ aparecerá en el mapa, pero queda versionado y listo para promover.
 | Necesitas… | Va en |
 |---|---|
 | Cambiar un texto o añadir un lugar | `public/data/places.js` |
+| Una fotografía | `public/fotos/<slug>.jpg` + `images[0]` en `places.js` |
 | Cálculo geográfico | `src/services/geoService.js` (puro) |
 | Algo del dispositivo (GPS, almacenamiento) | `src/services/locationService.js` |
 | Nueva fuente de datos | `src/repositories/` con la interfaz de `placeRepository.js` |

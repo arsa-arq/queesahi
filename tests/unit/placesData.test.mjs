@@ -72,3 +72,24 @@ test("todo lugar publicado cita al menos una fuente", () => {
     assert.ok(place.sources.length > 0, `${place.id} no cita fuentes`);
   }
 });
+
+test("cada lugar publicado declara una fotografía utilizable", () => {
+  const { firstImage } = html;
+  for (const place of places.filter((p) => p.status === "published")) {
+    const image = firstImage(place);
+    assert.ok(image, `${place.id} no tiene fotografía`);
+    assert.ok(image.alt.trim(), `${place.id}: la fotografía no tiene alt`);
+  }
+});
+
+test("los archivos de fotografía referenciados existen", async () => {
+  const { existsSync } = await import("node:fs");
+  const { fileURLToPath } = await import("node:url");
+  const raiz = fileURLToPath(new URL("../../", import.meta.url));
+  const { firstImage } = html;
+  for (const place of places) {
+    const image = firstImage(place);
+    if (!image || /^https?:\/\//i.test(image.src)) continue;
+    assert.ok(existsSync(raiz + image.src), `falta el archivo ${image.src} (${place.id})`);
+  }
+});

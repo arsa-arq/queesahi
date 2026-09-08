@@ -67,3 +67,53 @@ test("isHexColor: rechaza el color que rompía la ficha", () => {
   assert.equal(isHexColor("rojo"), false);
   assert.equal(isHexColor(undefined), false);
 });
+
+// --- Fotografías de las fichas -------------------------------------------
+
+const { safeImageSrc, normalizeImage, firstImage } = htmlModule;
+
+test("safeImageSrc: acepta rutas del proyecto y URLs http(s)", () => {
+  assert.equal(safeImageSrc("public/fotos/plaza-de-bolivar.jpg"), "public/fotos/plaza-de-bolivar.jpg");
+  assert.equal(safeImageSrc("./fotos/x.png"), "./fotos/x.png");
+  assert.equal(safeImageSrc("https://ejemplo.co/foto.jpg"), "https://ejemplo.co/foto.jpg");
+});
+
+test("safeImageSrc: rechaza esquemas y orígenes ajenos", () => {
+  assert.equal(safeImageSrc("javascript:alert(1)"), "");
+  assert.equal(safeImageSrc("data:image/svg+xml,<svg onload=alert(1)>"), "");
+  assert.equal(safeImageSrc("//otro-sitio.com/foto.jpg"), "");
+  assert.equal(safeImageSrc("  "), "");
+  assert.equal(safeImageSrc(null), "");
+});
+
+test("normalizeImage: admite la forma corta y la completa", () => {
+  assert.deepEqual(normalizeImage("public/fotos/a.jpg"), {
+    src: "public/fotos/a.jpg",
+    alt: "",
+    credit: ""
+  });
+  assert.deepEqual(
+    normalizeImage({ src: "public/fotos/a.jpg", alt: "Una plaza", credit: "Autora, CC BY" }),
+    { src: "public/fotos/a.jpg", alt: "Una plaza", credit: "Autora, CC BY" }
+  );
+});
+
+test("normalizeImage: descarta lo que no tenga ruta utilizable", () => {
+  assert.equal(normalizeImage({ alt: "sin src" }), null);
+  assert.equal(normalizeImage({ src: "javascript:alert(1)" }), null);
+  assert.equal(normalizeImage(""), null);
+  assert.equal(normalizeImage(null), null);
+  assert.equal(normalizeImage(42), null);
+});
+
+test("firstImage: devuelve la primera utilizable, saltando las inválidas", () => {
+  const place = {
+    images: [{ src: "javascript:alert(1)" }, "public/fotos/buena.jpg"]
+  };
+  assert.equal(firstImage(place).src, "public/fotos/buena.jpg");
+});
+
+test("firstImage: null si el lugar no tiene fotografías", () => {
+  assert.equal(firstImage({ images: [] }), null);
+  assert.equal(firstImage({}), null);
+});

@@ -334,6 +334,10 @@ button.cta.busy .spinner {
 }
 
 .sheet {
+  /* Alto del encabezado. Lo consumen el banner y el padding del cuerpo, así
+     que basta cambiarlo aquí para reencuadrar toda la ficha. */
+  --header-h: 118px;
+
   position: absolute;
   inset: auto 0 0 0;
   z-index: 1600;
@@ -346,6 +350,13 @@ button.cta.busy .spinner {
   display: flex;
   flex-direction: column;
   padding-bottom: var(--safe-b);
+  /* Recorta la fotografía contra las esquinas redondeadas de la ficha. */
+  overflow: hidden;
+}
+
+/* Con fotografía el encabezado crece: la imagen necesita sitio para leerse. */
+.sheet.with-photo {
+  --header-h: 210px;
 }
 
 .sheet.open {
@@ -353,17 +364,32 @@ button.cta.busy .spinner {
 }
 
 .sheet .grabber {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
   width: 44px;
   height: 5px;
   background: var(--line);
   border-radius: 999px;
-  margin: 10px auto 4px;
-  flex: none;
 }
 
+/* Sobre la fotografía, el tirador necesita contraste propio. */
+.sheet.with-photo .grabber {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+/* ---- Encabezado fijo -------------------------------------------------
+   Se saca del flujo y se ancla arriba. El cuerpo ocupa toda la ficha por
+   debajo, de modo que el texto se desliza POR DETRÁS de la fotografía al
+   desplazarse, en vez de cortarse contra su borde inferior. */
+
 .sheet .banner {
-  height: 118px;
-  flex: none;
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--header-h);
+  z-index: 2;
   --c: var(--brand-blue);
   background: var(--c);
   background: linear-gradient(135deg, var(--c) 0%, color-mix(in srgb, var(--c) 62%, #000) 100%);
@@ -371,14 +397,47 @@ button.cta.busy .spinner {
   align-items: flex-end;
   padding: 14px 20px;
   color: #fff;
-  position: relative;
   overflow: hidden;
+  /* Sin `transition` sobre `height`: pasar de una ficha con fotografía a otra
+     sin ella no necesita animarse, y animarlo solo llama la atención sobre el
+     hueco. El alto se fija antes de que la imagen cargue (ver placeSheet.js),
+     así que no hay salto que suavizar. */
+}
+
+.sheet .banner .photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Velo inferior: mantiene legible el título sobre cualquier fotografía. */
+.sheet .banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 48, 92, 0) 30%,
+    rgba(4, 48, 92, 0.35) 62%,
+    rgba(4, 48, 92, 0.82) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sheet.with-photo .banner::before {
+  opacity: 1;
 }
 
 .sheet .banner::after {
   content: "";
   position: absolute;
   inset: auto 0 0 0;
+  z-index: 3;
   height: 4px;
   background: var(--palette-ribbon);
 }
@@ -387,21 +446,39 @@ button.cta.busy .spinner {
   position: absolute;
   right: 14px;
   top: 8px;
+  z-index: 1;
   font-size: 62px;
   opacity: 0.4;
   line-height: 1;
+  transition: opacity 0.2s ease;
+}
+
+/* Con fotografía, el emoji sobra: ya está en el marcador del mapa. */
+.sheet.with-photo .banner .emoji {
+  opacity: 0;
 }
 
 .sheet .banner h2 {
+  position: relative;
+  z-index: 2;
   margin: 0;
   font-size: 1.4rem;
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
 }
 
+.sheet.with-photo .banner h2 {
+  font-size: 1.5rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+
 .sheet .body {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 16px 20px 26px;
+  /* Reserva el hueco del encabezado: el contenido empieza justo debajo, pero
+     su caja de desplazamiento sigue por detrás de él. */
+  padding: calc(var(--header-h) + 16px) 20px 26px;
 }
 
 .sheet .meta {
@@ -490,6 +567,20 @@ button.cta.busy .spinner {
 
 .sheet .sources strong {
   color: var(--text);
+}
+
+/* El crédito de la fotografía va junto a las fuentes: es una atribución más. */
+.sheet .sources.credit {
+  border-top: 0;
+  padding-top: 4px;
+}
+
+/* Pantallas bajas (móvil apaisado, ventanas pequeñas): la fotografía cede
+   altura para que quede texto visible. */
+@media (max-height: 620px) {
+  .sheet.with-photo {
+    --header-h: 150px;
+  }
 }
 
 .sheet .close {

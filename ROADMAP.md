@@ -18,6 +18,8 @@ registrada como primer commit del repositorio.
 - Escapado de HTML en todas las fichas.
 - Validador de contenido y pruebas unitarias en integración continua.
 - Enlaces compartibles por lugar y foco atrapado en la ficha.
+- Fotografía fija en la cabecera de cada ficha, con el texto deslizándose por
+  debajo (adelanto de la v0.3).
 - Se abre con doble clic, sin servidor ni instalación ([ADR 0005](docs/adr/0005-abrir-con-doble-clic-sin-servidor.md)).
 
 ## Siguiente
@@ -28,7 +30,8 @@ depender del GPS.
 
 - Lista de lugares accesible desde la cabecera, ordenable por cercanía.
 - Búsqueda por nombre y filtro por categoría.
-- Ficha ampliada con imágenes (`images` ya está en el modelo, vacío).
+- ~~Ficha ampliada con imágenes.~~ **Hecho en la 0.2.2**; falta sustituir los
+  marcadores de posición por fotografías reales.
 
 Esta versión es la que probablemente dispare la migración a React: es la
 primera con estado compartido entre vistas. Ver [ADR 0002](docs/adr/0002-sin-paso-de-construccion-en-v0.2.md).
@@ -70,5 +73,6 @@ Dominio definitivo, seguridad, rendimiento y operación.
 | El arranque bajo `file://` se verifica a mano | CI | v0.3 |
 | Sin tipos entre archivos (`QEA.require` devuelve `any`) | `src/` | al migrar a TypeScript |
 | `docs/product/contenido-por-verificar.md` con datos sin confirmar | contenido | continuo |
+| Las seis fotografías son marcadores de posición | `public/fotos/` | antes del piloto |
 | Sin licencia declarada en `package.json` | raíz | antes de publicar |
 | Carpetas `content/` y `supabase/` de la sección 10 aún sin crear | raíz | cuando haya qué poner en ellas |

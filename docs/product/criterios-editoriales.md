@@ -30,6 +30,23 @@ De ahí salen tres consecuencias:
 
 Un campo vacío se omite; la ficha no lo muestra. Es mejor omitirlo que rellenarlo.
 
+## La fotografía
+
+Va fija en la parte superior de la ficha, y el texto se desliza por debajo. Es
+lo primero que se ve, así que decide si alguien sigue leyendo.
+
+- **Que se reconozca desde la calle.** La foto sirve para confirmar «es esto lo
+  que tengo delante», no para ganar un concurso. Una vista frontal legible vale
+  más que un encuadre bonito.
+- **Horizontal, con lo importante al centro.** La ficha recorta los bordes y
+  cubre la franja inferior con el nombre del lugar.
+- **Sin gente identificable en primer plano**, salvo permiso.
+- **Con `alt` que describa lo que se ve.** No «Plaza de Bolívar» —eso ya está
+  en el título— sino qué aparece en la imagen.
+- **Con `credit`**: autoría y licencia. Es una atribución más, como las fuentes.
+
+Los requisitos técnicos y de derechos están en `public/fotos/README.md`.
+
 ## Reglas
 
 - **Nada sin fuente.** `status: "published"` exige al menos una entrada en

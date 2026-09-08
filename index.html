@@ -84,10 +84,18 @@
       >
         <div class="grabber" aria-hidden="true"></div>
         <button class="close" id="sheetClose" type="button" aria-label="Cerrar ficha">×</button>
-        <div class="banner">
+
+        <!-- Encabezado fijo. La fotografía se inserta desde placeSheet.js; si
+             no hay ninguna, o no carga, queda el degradado de marca con el
+             emoji, que es como se veía antes de que existieran las fotos. -->
+        <div class="banner" id="sheetBanner">
           <span class="emoji" id="sheetEmoji" aria-hidden="true">📍</span>
           <h2 id="sheetTitle">—</h2>
         </div>
+
+        <!-- El cuerpo ocupa toda la ficha y reserva el alto del encabezado con
+             un padding, de modo que el texto pasa por detrás de la fotografía
+             al desplazarse en vez de cortarse contra ella. -->
         <div class="body" id="sheetBody"><!-- render dinámico --></div>
       </aside>
     </div>
