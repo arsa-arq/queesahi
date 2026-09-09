@@ -28,6 +28,13 @@ npm start
 
 Y abre <http://localhost:8000>.
 
+## Publicarlo
+
+Para que otras personas la usen desde su teléfono, se publica en GitHub Pages.
+El paso a paso —y por qué subir archivos arrastrándolos a la web de GitHub no
+funciona— está en
+[`docs/despliegue-github.md`](docs/despliegue-github.md).
+
 ## Comandos
 
 | Comando | Qué hace |
@@ -139,6 +146,7 @@ Ver [`AGENTS.md`](AGENTS.md). En resumen: editar `public/data/places.js`,
 | [`CHANGELOG.md`](CHANGELOG.md) | Qué cambió en cada versión. |
 | [`docs/adr/`](docs/adr/) | Por qué el código es como es. |
 | [`docs/product/`](docs/product/) | Criterios editoriales y contenido pendiente. |
+| [`docs/despliegue-github.md`](docs/despliegue-github.md) | Subir el proyecto y publicarlo en línea. |
 
 ## Estado
 

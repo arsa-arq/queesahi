@@ -14,7 +14,7 @@
  * Sale con código 1 si hay errores. Los avisos no rompen la construcción.
  */
 
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
@@ -27,6 +27,29 @@ const { PLACE_STATUSES } = globalThis.QEA.types;
 const { isHexColor, normalizeImage } = globalThis.QEA.html;
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+
+/**
+ * Nombres de archivo que generó `npm run fotos:placeholders`.
+ *
+ * Distinguir un marcador de posición de una fotografía real es lo que permite
+ * exigirle a la segunda lo que a la primera no tiene sentido pedirle: una
+ * descripción de lo que se ve y una autoría con licencia.
+ */
+function marcadoresGenerados() {
+  const archivo = resolve(ROOT, "public/fotos/.marcadores.json");
+  if (!existsSync(archivo)) return [];
+  try {
+    const datos = JSON.parse(readFileSync(archivo, "utf8"));
+    return Array.isArray(datos.generados) ? datos.generados : [];
+  } catch {
+    return [];
+  }
+}
+
+const MARCADORES = marcadoresGenerados();
+
+/** Texto que delata un campo heredado del marcador y no actualizado. */
+const TEXTO_DE_MARCADOR = /marcador de posici[oó]n|fotograf[ií]a pendiente/i;
 
 const DATA_FILE = "public/data/places.js";
 
@@ -86,6 +109,9 @@ function validateImages(place, label) {
       return;
     }
 
+    const nombreArchivo = image.src.split("/").pop() || "";
+    const esMarcador = MARCADORES.includes(nombreArchivo);
+
     if (place.status === "published" && !image.alt.trim()) {
       fail(
         `${label}: la imagen${position} no tiene «alt». Describe lo que se ve, ` +
@@ -93,8 +119,43 @@ function validateImages(place, label) {
       );
     }
 
-    if (place.status === "published" && !image.credit.trim()) {
-      warn(`${label}: la imagen${position} no declara «credit» (autoría y licencia).`);
+    if (place.status === "published" && !esMarcador) {
+      // Fotografía real: aquí sí se exige todo.
+      if (TEXTO_DE_MARCADOR.test(image.alt)) {
+        fail(
+          `${label}: la imagen${position} ya es una fotografía real, pero su «alt» ` +
+            `sigue describiendo el marcador de posición. Descríbe lo que se ve en la foto.`
+        );
+      }
+      if (!image.credit.trim()) {
+        fail(
+          `${label}: la fotografía${position} no declara «credit». Ninguna imagen ` +
+            `se publica sin autoría y licencia (ver public/fotos/README.md).`
+        );
+      } else if (TEXTO_DE_MARCADOR.test(image.credit)) {
+        fail(
+          `${label}: la fotografía${position} conserva el «credit» del marcador. ` +
+            `Escribe quién la tomó y bajo qué licencia.`
+        );
+      }
+    }
+
+    if (place.status === "published" && esMarcador && !image.credit.trim()) {
+      warn(`${label}: la imagen${position} no declara «credit».`);
+    }
+
+    // Peso: la herramienta se usa en la calle, con datos móviles.
+    if (!esMarcador && !/^https?:\/\//i.test(image.src)) {
+      const archivo = resolve(ROOT, image.src);
+      if (existsSync(archivo)) {
+        const kb = Math.round(statSync(archivo).size / 1024);
+        if (kb > 300) {
+          warn(
+            `${label}: la fotografía${position} pesa ${kb} kB. El límite acordado ` +
+              `son 300 kB (public/fotos/README.md).`
+          );
+        }
+      }
     }
 
     // Solo se puede comprobar la existencia de las rutas locales.

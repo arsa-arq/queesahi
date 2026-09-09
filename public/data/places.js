@@ -15,7 +15,7 @@
 
 globalThis.__QEA_PLACES__ = {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-08",
+  "updatedAt": "2026-09-09",
   "places": [
     {
       "id": "plaza-de-bolivar",
@@ -39,9 +39,9 @@ globalThis.__QEA_PLACES__ = {
       ],
       "images": [
         {
-          "src": "public/fotos/plaza-de-bolivar.png",
-          "alt": "Marcador de posición: fondo rojo ladrillo con el emoji de un edificio clásico y el nombre del lugar.",
-          "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
+          "src": "public/fotos/plaza-de-bolivar.jpg",
+          "alt": "La Catedral Primada, con sus dos torres de piedra, ocupa el costado oriental de la plaza; a su derecha se alinean la Capilla del Sagrario, el Palacio Arzobispal y el Capitolio Nacional con su columnata. Sobre el piso de ladrillo hay palomas y algunos transeúntes, bajo un cielo de nubes.",
+          "credit": ""
         }
       ],
       "sources": [
@@ -50,7 +50,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-08"
+      "updatedAt": "2026-09-09"
     },
     {
       "id": "museo-del-oro",
@@ -74,9 +74,9 @@ globalThis.__QEA_PLACES__ = {
       ],
       "images": [
         {
-          "src": "public/fotos/museo-del-oro.png",
-          "alt": "Marcador de posición: fondo naranja ámbar con el emoji de una moneda y el nombre del lugar.",
-          "credit": "Marcador de posición generado por el proyecto. Pendiente de fotografía real."
+          "src": "public/fotos/museo-del-oro.jpeg",
+          "alt": "Esquina del edificio del Museo del Oro, revestido en placas de piedra clara, con el nombre del museo calado en letras grandes sobre la fachada y la sombra de un árbol proyectada encima. Abajo, la entrada acristalada y gente caminando por el andén; a la izquierda asoman los cerros.",
+          "credit": ""
         }
       ],
       "sources": [
@@ -85,7 +85,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-08"
+      "updatedAt": "2026-09-09"
     },
     {
       "id": "cerro-de-monserrate",
