@@ -29,7 +29,7 @@ npm start         # servidor local; solo para probar desde el móvil
 npm run validate  # valida public/data/places.js
 npm test          # pruebas unitarias (node:test, sin dependencias)
 npm run typecheck # tipos con JSDoc + tsc (requiere npm install)
-npm run check     # validate + test, lo mínimo antes de un commit
+npm run check     # version:sync + validate + test, lo mínimo antes de un commit
 ```
 
 Todo funciona **sin `npm install`** salvo `typecheck`, que necesita las
@@ -118,5 +118,7 @@ sección 11.
 - [ ] Si cambiaste el comportamiento, hay una prueba que lo demuestra.
 - [ ] Si cambiaste la estructura, hay un ADR.
 - [ ] `CHANGELOG.md` actualizado.
+- [ ] Si publicas una versión: `package.json` actualizado y `npm run version:sync`
+      ejecutado, o la caché servirá una mezcla rota (ver `scripts/sync-version.mjs`).
 - [ ] Lo verificaste **abriendo `index.html` con doble clic**, no solo con
       `npm start` ni solo en la terminal.

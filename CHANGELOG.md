@@ -2,6 +2,34 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.3.1] — 2026-09-10
+
+### Corregido
+
+- **La caché de GitHub Pages servía una mezcla rota tras publicar.** Pages
+  entrega todo con `Cache-Control: max-age=600`, de modo que un visitante que ya
+  había entrado recibía el `index.html` de la 0.3.0 junto al `app.css` y el
+  `main.js` de la 0.2.3. El resultado no era «la versión anterior» sino un
+  híbrido: el armazón del menú lateral sin sus estilos ni su lógica, con la «×»
+  de cerrar y el botón «Mostrar todas» sueltos sobre el mapa, la lista de
+  categorías vacía y las fichas sin su categoría.
+
+  Ahora cada `<link>` y `<script>` local de `index.html` termina en
+  `?v=<versión>`. Un caché desactualizado devuelve entonces la versión anterior
+  **entera y coherente**, que es un fallo aceptable, en vez de una mezcla.
+
+### Añadido
+
+- `npm run version:sync` (`scripts/sync-version.mjs`), que sella los archivos
+  con la versión de `package.json`. Entra en `npm run check`.
+- Dos pruebas: que el sello coincida con `package.json` —olvidarse de
+  ejecutarlo se detecta antes de publicar— y que los archivos de CDN **no**
+  lleven sello, porque su URL ya trae la versión y un parámetro extra
+  invalidaría la comprobación de integridad.
+
+Comprobado que el sello no rompe la apertura con doble clic: bajo `file://` el
+navegador ignora la cadena de consulta y carga los archivos igual.
+
 ## [0.3.0] — 2026-09-10
 
 ### Añadido

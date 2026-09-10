@@ -16,9 +16,12 @@ import { QEA } from "../helpers/loadApp.mjs";
 const ROOT = new URL("../../", import.meta.url);
 const indexHtml = await readFile(new URL("index.html", ROOT), "utf8");
 
-/** Rutas locales de los <script src="..."> de index.html, en orden. */
+/**
+ * Rutas locales de los <script src="..."> de index.html, en orden.
+ * Se quita el sello `?v=x.y.z` que añade `npm run version:sync`.
+ */
 const scriptOrder = [...indexHtml.matchAll(/<script\s+src="([^"]+)"/g)]
-  .map((match) => match[1])
+  .map((match) => match[1].split("?")[0])
   .filter((src) => !src.startsWith("http"));
 
 test("index.html carga namespace.js antes que cualquier otro archivo propio", () => {
@@ -88,5 +91,37 @@ test("todos los módulos esperados quedan registrados", () => {
     "inMemoryPlaceRepository"
   ]) {
     assert.ok(QEA[name], `falta registrar «${name}»`);
+  }
+});
+
+// --- Sello de versión contra la caché -------------------------------------
+
+test("todos los archivos locales llevan el sello de la versión actual", async () => {
+  // GitHub Pages sirve con Cache-Control: max-age=600. Sin este sello, tras
+  // publicar una versión un visitante puede recibir el index.html nuevo con el
+  // CSS y el JS viejos: no la versión anterior, sino un híbrido roto. Pasó de
+  // verdad. Ver scripts/sync-version.mjs.
+  const { version } = JSON.parse(await readFile(new URL("package.json", ROOT), "utf8"));
+
+  const locales = [...indexHtml.matchAll(/\s(?:src|href)="((?!https?:)[^"]+\.(?:js|css)[^"]*)"/g)].map(
+    (m) => m[1]
+  );
+
+  assert.ok(locales.length > 0, "no se encontró ningún archivo local en index.html");
+
+  for (const ruta of locales) {
+    assert.ok(
+      ruta.endsWith(`?v=${version}`),
+      `«${ruta}» no lleva el sello ?v=${version}. Ejecuta: npm run version:sync`
+    );
+  }
+});
+
+test("los archivos de CDN no llevan sello", () => {
+  // Su URL ya incluye la versión de la librería, y añadir un parámetro
+  // invalidaría la comprobación de integridad del navegador.
+  const cdn = [...indexHtml.matchAll(/\s(?:src|href)="(https?:\/\/[^"]+)"/g)].map((m) => m[1]);
+  for (const url of cdn) {
+    assert.ok(!url.includes("?v="), `${url} no debería llevar sello de versión`);
   }
 });

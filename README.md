@@ -45,7 +45,8 @@ funciona— está en
 | `npm run typecheck` | Verifica los tipos JSDoc con TypeScript. Requiere `npm install`. |
 | `npm run export:json` | Exporta los datos a `places.json` para otras herramientas. |
 | `npm run fotos:placeholders` | Regenera las imágenes provisionales de `public/fotos/`. |
-| `npm run check` | `validate` + `test`. Lo mínimo antes de proponer un cambio. |
+| `npm run version:sync` | Sella el CSS y el JS de `index.html` con la versión, contra la caché. |
+| `npm run check` | `version:sync` + `validate` + `test`. Lo mínimo antes de proponer un cambio. |
 
 ## Qué incluye
 

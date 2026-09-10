@@ -1,6 +1,6 @@
 {
   "name": "que-es-ahi",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "type": "module",
   "description": "Exploración urbana geolocalizada del centro histórico de Bogotá.",
@@ -15,8 +15,9 @@
     "test": "node --test \"tests/**/*.test.mjs\"",
     "typecheck": "tsc -p jsconfig.json",
     "export:json": "node scripts/export-json.mjs",
-    "check": "npm run validate && npm run test",
-    "fotos:placeholders": "node scripts/generate-placeholders.mjs"
+    "check": "npm run version:sync && npm run validate && npm run test",
+    "fotos:placeholders": "node scripts/generate-placeholders.mjs",
+    "version:sync": "node scripts/sync-version.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

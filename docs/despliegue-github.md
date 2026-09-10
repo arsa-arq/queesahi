@@ -109,6 +109,14 @@ diagnosticar.
 de archivos bloqueados, pausa la sincronización mientras trabajas. Para un
 proyecto que ya vive en GitHub, OneDrive deja de ser necesario como respaldo.
 
+**Al publicar una versión, sube también el sello.** GitHub Pages sirve todo con
+`Cache-Control: max-age=600`. Sin precaución, quien ya hubiera entrado recibe el
+`index.html` nuevo junto al CSS y el JS antiguos: no la versión anterior, sino
+un híbrido roto. Por eso cada archivo local de `index.html` termina en
+`?v=<versión>`; `npm run version:sync` lo actualiza y `npm test` comprueba que
+coincida con `package.json`. Sube la versión en `package.json` y ejecuta
+`npm run check` antes de empujar.
+
 **Nunca subas por la web encima de lo empujado.** Mezclar los dos métodos
 descuadra el historial. A partir de aquí, todo por `git push`.
 
