@@ -36,26 +36,40 @@
    * borrador seguía siendo accesible si algo lo pedía por su id; ahora mostrar
    * material no publicado exige pedirlo explícitamente.
    *
-   * @param {() => Promise<Place[]>} loadPlaces
+   * `load` devuelve el documento completo —lugares y catálogo de categorías—
+   * porque ambos vienen de la misma fuente y deben cargarse a la vez: un lugar
+   * que apunta a una categoría inexistente es un dato roto, y solo se puede
+   * detectar teniendo los dos delante.
+   *
+   * @param {() => Promise<{ places: Place[], categories?: Category[] }>} load
    * @returns {PlaceRepository}
    */
-  function createPlaceRepository(loadPlaces) {
-    /** @type {Promise<Place[]>|null} */
+  function createPlaceRepository(load) {
+    /** @type {Promise<{ places: Place[], categories: Category[] }>|null} */
     let pending = null;
 
-    /** @returns {Promise<Place[]>} */
-    function all() {
+    /** @returns {Promise<{ places: Place[], categories: Category[] }>} */
+    function documento() {
       if (!pending) {
         // Se guarda la promesa, no el resultado: dos llamadas simultáneas al
         // arrancar comparten una sola carga.
         pending = Promise.resolve()
-          .then(loadPlaces)
+          .then(load)
+          .then((doc) => ({
+            places: doc.places || [],
+            categories: doc.categories || []
+          }))
           .catch((error) => {
             pending = null; // un fallo no debe quedar cacheado para siempre
             throw error;
           });
       }
       return pending;
+    }
+
+    /** @returns {Promise<Place[]>} */
+    async function all() {
+      return (await documento()).places;
     }
 
     /**
@@ -82,6 +96,13 @@
       async getBySlug(slug, options) {
         const places = await all();
         return places.find((place) => place.slug === slug && isVisible(place, options)) || null;
+      },
+
+      async getCategories() {
+        const { categories } = await documento();
+        // Se ordena por número: el menú lateral debe presentarlas siempre en
+        // el mismo orden, sin depender de cómo estén escritas en el archivo.
+        return [...categories].sort((a, b) => a.number - b.number);
       },
 
       async refresh() {

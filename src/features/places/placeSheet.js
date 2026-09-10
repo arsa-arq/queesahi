@@ -8,7 +8,7 @@
  * Ver docs/adr/0003-escapado-html-en-las-fichas.md
  *
  * Depende de: app/namespace.js, utils/html.js, services/geoService.js,
- *             features/map/mapView.js
+ *             services/categoryService.js, features/map/mapView.js
  */
 
 (function (global) {
@@ -18,6 +18,7 @@
   const { html, toHtmlString, firstImage } = QEA.require("html");
   const { formatDistance } = QEA.require("geoService");
   const { accentOf } = QEA.require("mapView");
+  const { primaryCategory } = QEA.require("categoryService");
 
   /**
    * Enlace de navegación paso a paso. Las coordenadas se codifican como
@@ -120,6 +121,8 @@
     /** @type {Element|null} */
     let lastFocused = null;
     let open = false;
+    /** @type {Category[]} */
+    let categories = [];
 
     /**
      * Atrapa el foco marcando como `inert` todo lo que está fuera de la ficha
@@ -157,20 +160,32 @@
       close,
 
       /**
+       * @param {Category[]} nextCategories
+       */
+      setCategories(nextCategories) {
+        categories = nextCategories;
+      },
+
+      /**
        * @param {Place} place
        * @param {{ distance?: number }} [options]
        */
       show(place, options = {}) {
         lastFocused = document.activeElement;
 
-        const accent = accentOf(place);
+        const accent = accentOf(place, categories);
+        const category = primaryCategory(place, categories);
         const distance =
           typeof options.distance === "number"
             ? html`<span class="chip dist">a ${formatDistance(options.distance)} de ti</span>`
             : "";
-        const categories = (place.categories || []).map(
-          (category) => html`<span class="chip">${category}</span>`
-        );
+        // La categoría va primero y con su color: es la clasificación del
+        // predio, no una etiqueta más. Las «tags» editoriales van detrás, en
+        // gris, para que se distinga de un vistazo cuál es cuál.
+        const categoryChip = category
+          ? html`<span class="chip category" style="--cat-color:${accent}">${category.name}</span>`
+          : "";
+        const tagChips = (place.tags || []).map((tag) => html`<span class="chip">${tag}</span>`);
         const sources = (place.sources || []).join(" · ");
         const image = firstImage(place);
 
@@ -180,7 +195,7 @@
         renderPhoto(banner, sheet, image, place.name);
 
         body.innerHTML = toHtmlString(html`
-          <div class="meta">${distance}${categories}</div>
+          <div class="meta">${distance}${categoryChip}${tagChips}</div>
           <p class="summary">${place.summary}</p>
           <p class="location"><span aria-hidden="true">📌</span> ${place.location}</p>
           <section class="block"><p>${place.description}</p></section>

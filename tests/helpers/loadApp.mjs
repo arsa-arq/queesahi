@@ -16,6 +16,7 @@ import "../../src/utils/html.js";
 import "../../src/app/config.js";
 import "../../src/services/geoService.js";
 import "../../src/services/locationService.js";
+import "../../src/services/categoryService.js";
 import "../../src/repositories/placeRepository.js";
 import "../../src/repositories/embeddedPlaceRepository.js";
 import "../../src/repositories/inMemoryPlaceRepository.js";
@@ -30,5 +31,12 @@ import "../../src/repositories/inMemoryPlaceRepository.js";
 export const QEA = globalThis.QEA;
 
 /** @type {any} */
-export const { html, geoService, placeRepository, embeddedPlaceRepository, inMemoryPlaceRepository, types } =
-  QEA;
+export const {
+  html,
+  geoService,
+  categoryService,
+  placeRepository,
+  embeddedPlaceRepository,
+  inMemoryPlaceRepository,
+  types
+} = QEA;

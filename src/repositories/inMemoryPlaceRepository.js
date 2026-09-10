@@ -17,13 +17,15 @@
 
   /**
    * @param {Place[]} places
+   * @param {Category[]} [categories]
    * @returns {PlaceRepository}
    */
-  function createInMemoryPlaceRepository(places) {
+  function createInMemoryPlaceRepository(places, categories = []) {
     // Copia defensiva: quien construya el repositorio no debería poder mutar
     // sus datos después.
     const snapshot = places.map((place) => ({ ...place }));
-    return createPlaceRepository(async () => snapshot);
+    const catalogo = categories.map((category) => ({ ...category }));
+    return createPlaceRepository(async () => ({ places: snapshot, categories: catalogo }));
   }
 
   QEA.define("inMemoryPlaceRepository", { createInMemoryPlaceRepository });

@@ -31,6 +31,34 @@ publicado por no poder citarlos; se anotan aquí para no perderlos.
 compromete la credibilidad del proyecto. Es un cambio de una palabra en
 `places.js`.
 
+## Las siete categorías
+
+El catálogo de `public/data/places.js` está creado y funcionando, pero **su
+contenido es provisional en dos frentes**, ambos a la espera de que el equipo de
+la Cátedra los confirme:
+
+**Los nombres.** Se llaman «Categoría 1» … «Categoría 7». Cambiarlos es editar
+el campo `name` de cada entrada; ningún otro archivo depende de esos textos.
+`npm run validate` avisa mientras conserven el nombre provisional.
+
+**La adscripción de cada predio.** La asignación actual es arbitraria: se
+repartió un predio por categoría, de la 1 a la 6, conservando el color que cada
+lugar ya tenía para que el mapa no cambiara de aspecto. **No responde a ningún
+criterio temático.** La categoría 7 quedó vacía a propósito.
+
+| Predio | Categoría asignada | Criterio |
+|---|---|---|
+| Plaza de Bolívar | 1 | Ninguno: conservaba el rojo ladrillo |
+| Museo del Oro | 2 | Ninguno: conservaba el naranja |
+| Cerro de Monserrate | 3 | Ninguno: conservaba el verde |
+| Teatro Colón | 4 | Ninguno: conservaba el índigo |
+| Chorro de Quevedo | 5 | Ninguno: conservaba el teal |
+| Academia Colombiana de Historia | 6 | Ninguno: conservaba el azul |
+
+**El color de la categoría 7** (`#6F4A7F`, ciruela) tampoco viene del PDF de
+marca: la paleta original define cinco acentos más dos azules, y hacía falta un
+séptimo tono. Confirmar con quien lleva la identidad antes del piloto público.
+
 ## Revisión general pendiente
 
 Los cinco lugares originales citan instituciones (IDPC, Banco de la República,

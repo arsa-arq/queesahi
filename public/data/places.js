@@ -14,15 +14,58 @@
  */
 
 globalThis.__QEA_PLACES__ = {
-  "schemaVersion": 1,
-  "updatedAt": "2026-09-09",
+  "schemaVersion": 2,
+  "updatedAt": "2026-09-10",
+  "categories": [
+    {
+      "id": "categoria-1",
+      "number": 1,
+      "name": "Categoría 1",
+      "color": "#C74A2C"
+    },
+    {
+      "id": "categoria-2",
+      "number": 2,
+      "name": "Categoría 2",
+      "color": "#E0951E"
+    },
+    {
+      "id": "categoria-3",
+      "number": 3,
+      "name": "Categoría 3",
+      "color": "#7C8B4A"
+    },
+    {
+      "id": "categoria-4",
+      "number": 4,
+      "name": "Categoría 4",
+      "color": "#3C5393"
+    },
+    {
+      "id": "categoria-5",
+      "number": 5,
+      "name": "Categoría 5",
+      "color": "#05707F"
+    },
+    {
+      "id": "categoria-6",
+      "number": 6,
+      "name": "Categoría 6",
+      "color": "#04437F"
+    },
+    {
+      "id": "categoria-7",
+      "number": 7,
+      "name": "Categoría 7",
+      "color": "#6F4A7F"
+    }
+  ],
   "places": [
     {
       "id": "plaza-de-bolivar",
       "slug": "plaza-de-bolivar",
       "name": "Plaza de Bolívar",
       "emoji": "🏛️",
-      "color": "#C74A2C",
       "summary": "El corazón político e histórico de Bogotá y de Colombia.",
       "description": "Plaza principal fundacional de la ciudad, rodeada por el Capitolio Nacional, la Catedral Primada, el Palacio Liévano (Alcaldía Mayor), el Palacio de Justicia y el edificio del antiguo Cabildo. Es un rectángulo despejado de piso duro donde confluyen el poder legislativo, judicial, ejecutivo local y eclesiástico.",
       "whyItMatters": "Aquí se concentra la vida cívica del país: marchas, conciertos, posesiones presidenciales, mercados y celebraciones. El monumento a Simón Bolívar, inaugurado en 1846, fue la primera estatua pública de Bogotá.",
@@ -32,10 +75,13 @@ globalThis.__QEA_PLACES__ = {
       "latitude": 4.59808,
       "longitude": -74.07605,
       "location": "La Candelaria, Bogotá D.C.",
-      "categories": [
+      "tags": [
         "Historia",
         "Política",
         "Espacio público"
+      ],
+      "categoryIds": [
+        "categoria-1"
       ],
       "images": [
         {
@@ -50,14 +96,13 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-09"
+      "updatedAt": "2026-09-10"
     },
     {
       "id": "museo-del-oro",
       "slug": "museo-del-oro",
       "name": "Museo del Oro",
       "emoji": "🪙",
-      "color": "#E0951E",
       "summary": "La mayor colección de orfebrería prehispánica del mundo, al alcance de nuestras manos.",
       "description": "Museo del Banco de la República que reúne unas 34.000 piezas de oro y tumbaga y cerca de 25.000 objetos en cerámica, piedra, concha, hueso y textil, de culturas como Muisca, Quimbaya, Calima, Zenú, Tairona, Tolima y Nariño.",
       "whyItMatters": "Transformó la manera en que Colombia entiende su pasado indígena: el oro deja de leerse como riqueza y pasa a entenderse como un lenguaje simbólico, ritual y político de las sociedades prehispánicas.",
@@ -67,10 +112,13 @@ globalThis.__QEA_PLACES__ = {
       "latitude": 4.60193,
       "longitude": -74.07216,
       "location": "Carrera 6 con calle 16, La Candelaria, Bogotá D.C.",
-      "categories": [
+      "tags": [
         "Museo",
         "Arqueología",
         "Cultura"
+      ],
+      "categoryIds": [
+        "categoria-2"
       ],
       "images": [
         {
@@ -85,14 +133,13 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-09"
+      "updatedAt": "2026-09-10"
     },
     {
       "id": "cerro-de-monserrate",
       "slug": "cerro-de-monserrate",
       "name": "Cerro de Monserrate",
       "emoji": "⛰️",
-      "color": "#7C8B4A",
       "summary": "El cerro tutelar de Bogotá, a unos 3.152 m sobre el nivel del mar.",
       "description": "En la cima está el santuario del Señor Caído, meta de peregrinación. Se sube por funicular, por teleférico o por un camino peatonal empedrado. Desde el mirador se abarca casi toda la sabana de Bogotá.",
       "whyItMatters": "Es el principal lugar de peregrinación de la ciudad y una referencia visual permanente: se ve desde casi cualquier punto de Bogotá y orienta a quien camina por el centro.",
@@ -102,10 +149,13 @@ globalThis.__QEA_PLACES__ = {
       "latitude": 4.6057,
       "longitude": -74.0562,
       "location": "Cerros orientales, Bogotá D.C.",
-      "categories": [
+      "tags": [
         "Religión",
         "Mirador",
         "Naturaleza"
+      ],
+      "categoryIds": [
+        "categoria-3"
       ],
       "images": [
         {
@@ -120,14 +170,13 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-08"
+      "updatedAt": "2026-09-10"
     },
     {
       "id": "teatro-colon",
       "slug": "teatro-colon",
       "name": "Teatro Colón",
       "emoji": "🎭",
-      "color": "#3C5393",
       "summary": "El teatro nacional de Colombia, una joya del siglo XIX.",
       "description": "Teatro de ópera de estilo neoclásico inaugurado en 1892, obra del arquitecto italiano Pietro Cantini, sobre la calle 10 del centro histórico. Es la sala patrimonial más importante del país.",
       "whyItMatters": "Sede de las temporadas nacionales de ópera, danza y música sinfónica, y escenario de actos oficiales de Estado. Concentra buena parte de la memoria escénica del país.",
@@ -137,10 +186,13 @@ globalThis.__QEA_PLACES__ = {
       "latitude": 4.59723,
       "longitude": -74.07444,
       "location": "Calle 10 # 5-32, La Candelaria, Bogotá D.C.",
-      "categories": [
+      "tags": [
         "Patrimonio",
         "Arte",
         "Música"
+      ],
+      "categoryIds": [
+        "categoria-4"
       ],
       "images": [
         {
@@ -155,14 +207,13 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-08"
+      "updatedAt": "2026-09-10"
     },
     {
       "id": "chorro-de-quevedo",
       "slug": "chorro-de-quevedo",
       "name": "Chorro de Quevedo",
       "emoji": "⛲",
-      "color": "#05707F",
       "summary": "La plazoleta donde la tradición ubica la fundación de Bogotá.",
       "description": "Pequeña plaza empedrada de La Candelaria, con una capilla y una fuente. Es punto de encuentro de cuenteros, músicos, artesanos y estudiantes, sobre todo al caer la tarde.",
       "whyItMatters": "La tradición sostiene que aquí Gonzalo Jiménez de Quesada fundó Santa Fe el 6 de agosto de 1538, con doce chozas y una misa. Es un lugar simbólico del origen de la ciudad.",
@@ -172,10 +223,13 @@ globalThis.__QEA_PLACES__ = {
       "latitude": 4.59662,
       "longitude": -74.0713,
       "location": "Callejón del Embudo, La Candelaria, Bogotá D.C.",
-      "categories": [
+      "tags": [
         "Historia",
         "Fundación",
         "Vida urbana"
+      ],
+      "categoryIds": [
+        "categoria-5"
       ],
       "images": [
         {
@@ -190,14 +244,13 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-08"
+      "updatedAt": "2026-09-10"
     },
     {
       "id": "academia-colombiana-de-historia",
       "slug": "academia-colombiana-de-historia",
       "name": "Academia Colombiana de Historia",
       "emoji": "📚",
-      "color": "#04437F",
       "summary": "La corporación que estudia y custodia la historia de Colombia desde 1902.",
       "description": "Corporación de derecho privado, sin ánimo de lucro y con personería jurídica, dedicada al estudio, la investigación y la divulgación de la historia de Colombia. Su sede en La Candelaria reúne una biblioteca especializada, un archivo documental y las salas donde sesionan sus miembros.",
       "whyItMatters": "Estudia la historia del país desde los tiempos prehispánicos hasta la actualidad, y trabaja junto con otras instituciones en la conservación del patrimonio documental y en la defensa del patrimonio histórico y cultural.",
@@ -207,10 +260,13 @@ globalThis.__QEA_PLACES__ = {
       "latitude": 4.598117,
       "longitude": -74.077428,
       "location": "Calle 10, La Candelaria, Bogotá D.C.",
-      "categories": [
+      "tags": [
         "Historia",
         "Patrimonio",
         "Investigación"
+      ],
+      "categoryIds": [
+        "categoria-6"
       ],
       "images": [
         {
@@ -224,7 +280,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-08"
+      "updatedAt": "2026-09-10"
     }
   ]
 };

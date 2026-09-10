@@ -16,6 +16,12 @@
   --brand-teal: #05707f;
   --brand-indigo: #3c5393;
 
+  /* Séptimo acento, añadido para completar las siete categorías. Provisional:
+     la paleta original del PDF define cinco acentos más los dos azules, y este
+     tono se eligió por armonía, no por marca. Confirmar con quien lleva la
+     identidad antes del piloto público. */
+  --brand-plum: #6f4a7f;
+
   /* --- Roles de superficie --- */
   --bg: var(--brand-blue-deep);
   --surface: #ffffff;

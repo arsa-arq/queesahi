@@ -19,6 +19,8 @@
   const { getLastKnownPosition } = QEA.require("locationService");
   const { createMapView } = QEA.require("mapView");
   const { createPlaceSheet } = QEA.require("placeSheet");
+  const { createCategoryMenu } = QEA.require("categoryMenu");
+  const { filterByCategories, countByCategory } = QEA.require("categoryService");
   const { createLocateButton, createWhereAmIHandler } = QEA.require("whereAmI");
   const { createToast } = QEA.require("toast");
 
@@ -67,7 +69,10 @@
       emoji: need("#sheetEmoji"),
       body: need("#sheetBody"),
       banner: need("#sheet .banner"),
-      inertWhileOpen: [need("#map"), need(".topbar"), need(".cta-wrap")],
+      // El botón del menú entra en la lista: si no, se puede abrir el menú
+      // por encima de la ficha y, al cerrarlo, se libera el `inert` del mapa
+      // mientras el diálogo sigue abierto. El foco se escapaba por ahí.
+      inertWhileOpen: [need("#map"), need(".topbar"), need(".cta-wrap"), need("#btnCategorias")],
       onClose: () => clearRoute()
     });
 
@@ -75,6 +80,18 @@
       container: need("#map"),
       leaflet,
       onSelect: (place) => openPlace(place)
+    });
+
+    const categoryMenu = createCategoryMenu({
+      panel: need("#categorias"),
+      backdrop: need("#categoriasBackdrop"),
+      list: need("#categoriasLista"),
+      openButton: /** @type {HTMLButtonElement} */ (need("#btnCategorias")),
+      closeButton: need("#categoriasClose"),
+      resetButton: /** @type {HTMLButtonElement} */ (need("#categoriasReset")),
+      summary: need("#categoriasResumen"),
+      inertWhileOpen: [need("#map"), need(".topbar"), need(".cta-wrap")],
+      onChange: (selectedIds) => applyFilter(selectedIds)
     });
 
     // --- Enlaces profundos: #/lugar/<slug> --------------------------------
@@ -117,6 +134,10 @@
      * @param {{ distance?: number }} [options]
      */
     function openPlace(place, options = {}) {
+      // Nunca los dos paneles a la vez: cada uno gestiona el mismo `inert` y
+      // el segundo en cerrarse lo dejaría mal.
+      categoryMenu.close();
+
       const distance = options.distance === undefined ? estimatedDistance(place) : options.distance;
       sheet.show(place, distance === undefined ? {} : { distance });
 
@@ -143,6 +164,36 @@
       else sheet.close();
     });
 
+    // --- Filtro por categoría ---------------------------------------------
+
+    /** Todos los lugares publicados, sin filtrar. */
+    /** @type {Place[]} */
+    let allPlaces = [];
+    /** Los que se están mostrando ahora. */
+    /** @type {Place[]} */
+    let visiblePlaces = [];
+
+    /**
+     * Aplica la selección del menú al mapa.
+     *
+     * El botón «¿Qué es ahí?» busca entre los visibles, no entre todos: si
+     * alguien filtró por una categoría, preguntar qué tiene cerca debe
+     * responder dentro de esa categoría. El aviso de «estás lejos» ya existía
+     * y cubre el caso de que el resultado quede a varias cuadras.
+     *
+     * @param {string[]} selectedIds
+     */
+    function applyFilter(selectedIds) {
+      visiblePlaces = filterByCategories(allPlaces, selectedIds);
+      mapView.setPlaces(visiblePlaces, { fit: !sheet.isOpen() });
+
+      if (visiblePlaces.length === 0) {
+        toast.show("Ninguna categoría seleccionada tiene lugares todavía.");
+      } else {
+        toast.show("");
+      }
+    }
+
     // --- Carga de datos ---------------------------------------------------
 
     /** @type {Place[]} */
@@ -164,6 +215,15 @@
       return;
     }
 
+    // El catálogo de categorías da color a los marcadores y a las fichas, así
+    // que se entrega antes de dibujar nada.
+    const categories = await repository.getCategories();
+    mapView.setCategories(categories);
+    sheet.setCategories(categories);
+    categoryMenu.setCategories(categories, countByCategory(places, categories));
+
+    allPlaces = places;
+    visiblePlaces = places;
     mapView.setPlaces(places);
 
     // --- Botón «¿Qué es ahí?» ---------------------------------------------
@@ -172,7 +232,7 @@
     const locateButton = createLocateButton(button);
 
     const whereAmI = createWhereAmIHandler({
-      getPlaces: () => repository.getAll(),
+      getPlaces: async () => visiblePlaces,
       showUser: (point) => mapView.showUser(point),
       focusPlace: (place) => mapView.focusPlace(place),
       openPlace: (place, options) => openPlace(place, options),

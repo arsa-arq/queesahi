@@ -19,7 +19,7 @@
   const { createPlaceRepository, PlaceRepositoryError } = QEA.require("placeRepository");
 
   /** Versión del formato de datos que este código sabe leer. */
-  const SUPPORTED_SCHEMA_VERSION = 1;
+  const SUPPORTED_SCHEMA_VERSION = 2;
 
   /** Nombre de la variable global que deja `public/data/places.js`. */
   const GLOBAL_KEY = "__QEA_PLACES__";
@@ -27,14 +27,17 @@
   /**
    * Normaliza y valida el documento de datos.
    *
-   * Acepta tanto `{ schemaVersion, places: [...] }` como un arreglo suelto,
-   * para que un cambio de formato no rompa las herramientas que ya lo leen.
+   * Acepta tanto `{ schemaVersion, places, categories }` como un arreglo suelto
+   * de lugares, para que un cambio de formato no rompa las herramientas que ya
+   * lo leen. El formato 1 no tenía catálogo de categorías; se devuelve vacío.
    *
    * @param {unknown} document
-   * @returns {Place[]}
+   * @returns {{ places: Place[], categories: Category[] }}
    */
   function parsePlacesDocument(document) {
-    if (Array.isArray(document)) return /** @type {Place[]} */ (document);
+    if (Array.isArray(document)) {
+      return { places: /** @type {Place[]} */ (document), categories: [] };
+    }
 
     if (document && typeof document === "object") {
       const doc = /** @type {Record<string, unknown>} */ (document);
@@ -45,7 +48,12 @@
             `Los datos usan el formato ${version} y esta versión de la aplicación entiende hasta el ${SUPPORTED_SCHEMA_VERSION}.`
           );
         }
-        return /** @type {Place[]} */ (doc.places);
+        return {
+          places: /** @type {Place[]} */ (doc.places),
+          categories: Array.isArray(doc.categories)
+            ? /** @type {Category[]} */ (doc.categories)
+            : []
+        };
       }
     }
 

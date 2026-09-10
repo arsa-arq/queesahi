@@ -48,6 +48,9 @@ function marcadoresGenerados() {
 
 const MARCADORES = marcadoresGenerados();
 
+/** Cuántas categorías debe tener el catálogo. Fijado por el equipo de la Cátedra. */
+const NUMERO_DE_CATEGORIAS = 7;
+
 /** Texto que delata un campo heredado del marcador y no actualizado. */
 const TEXTO_DE_MARCADOR = /marcador de posici[oó]n|fotograf[ií]a pendiente/i;
 
@@ -61,7 +64,7 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 const REQUIRED_TEXT = ["id", "slug", "name", "summary", "description", "location"];
 const OPTIONAL_TEXT = ["whyItMatters", "lookCloser", "historicalContext", "curiosity", "emoji"];
-const REQUIRED_ARRAYS = ["categories", "sources"];
+const REQUIRED_ARRAYS = ["tags", "sources"];
 
 /** @type {string[]} */
 const errors = [];
@@ -78,6 +81,47 @@ const warn = (message) => warnings.push(message);
  * @returns {boolean}
  */
 const isNonEmptyString = (value) => typeof value === "string" && value.trim().length > 0;
+
+/**
+ * Comprueba la adscripción de un predio a la taxonomía de siete categorías.
+ *
+ * Un predio fuera del catálogo desaparecería del mapa en cuanto alguien use el
+ * menú lateral, y el fallo se notaría tarde y mal.
+ *
+ * @param {Record<string, unknown>} place
+ * @param {string} label
+ * @param {Set<string>} idsValidos
+ */
+function validateCategoryIds(place, label, idsValidos) {
+  const ids = place.categoryIds;
+
+  if (!Array.isArray(ids)) {
+    fail(`${label}: «categoryIds» debe ser un arreglo con al menos una categoría.`);
+    return;
+  }
+
+  if (ids.length === 0) {
+    fail(
+      `${label}: no pertenece a ninguna categoría. Todo predio debe estar en ` +
+        `una de las ${NUMERO_DE_CATEGORIAS}.`
+    );
+    return;
+  }
+
+  for (const id of ids) {
+    if (!isNonEmptyString(id)) {
+      fail(`${label}: «categoryIds» contiene una entrada vacía.`);
+      continue;
+    }
+    if (idsValidos && !idsValidos.has(String(id))) {
+      fail(`${label}: la categoría «${id}» no existe en el catálogo.`);
+    }
+  }
+
+  if (new Set(ids).size !== ids.length) {
+    warn(`${label}: «categoryIds» repite alguna categoría.`);
+  }
+}
 
 /**
  * Comprueba las fotografías de un lugar.
@@ -172,7 +216,7 @@ function validateImages(place, label) {
  * @param {Record<string, unknown>} place
  * @param {number} index
  */
-function validatePlace(place, index) {
+function validatePlace(place, index, idsValidos) {
   const label = isNonEmptyString(place.id) ? `«${place.id}»` : `#${index + 1}`;
 
   for (const field of REQUIRED_TEXT) {
@@ -236,11 +280,13 @@ function validatePlace(place, index) {
     fail(`${label}: un lugar publicado debe citar al menos una fuente.`);
   }
 
+  validateCategoryIds(place, label, idsValidos);
   validateImages(place, label);
 
-  if (place.color !== undefined && !isHexColor(place.color)) {
-    fail(
-      `${label}: «color» debe ser un hexadecimal de seis dígitos como «#04437F». Recibido: «${place.color}».`
+  if (place.color !== undefined) {
+    warn(
+      `${label}: «color» ya no se usa. El acento lo aporta la categoría del ` +
+        `predio; puedes borrar el campo.`
     );
   }
 
@@ -301,10 +347,10 @@ function validateCollection(places) {
     return [...seen.entries()].filter(([, ids]) => ids.length > 1);
   };
 
-  for (const field of ["color", "emoji"]) {
-    for (const [value, ids] of duplicatesIn(published, field)) {
-      warn(`Dos lugares publicados comparten «${field}» ${value}: ${ids.join(", ")}.`);
-    }
+  // El color ya no distingue lugares —agrupa categorías—, pero el emoji sí:
+  // es lo único que diferencia dos marcadores de la misma categoría.
+  for (const [value, ids] of duplicatesIn(published, "emoji")) {
+    warn(`Dos lugares publicados comparten el emoji ${value}: ${ids.join(", ")}.`);
   }
 
   // Direcciones idénticas suelen ser un copiar y pegar sin corregir.
@@ -314,6 +360,74 @@ function validateCollection(places) {
 
   if (published.length === 0) {
     fail("No hay ningún lugar publicado: la aplicación arrancaría vacía.");
+  }
+}
+
+/**
+ * Comprueba el catálogo de categorías.
+ *
+ * @param {Record<string, unknown>[]} categories
+ */
+function validateCategories(categories) {
+  if (categories.length !== NUMERO_DE_CATEGORIAS) {
+    fail(
+      `El catálogo tiene ${categories.length} categorías y deben ser ` +
+        `${NUMERO_DE_CATEGORIAS}.`
+    );
+  }
+
+  categories.forEach((category, index) => {
+    const label = isNonEmptyString(category.id) ? `«${category.id}»` : `categoría #${index + 1}`;
+
+    if (!isNonEmptyString(category.id) || !KEBAB_CASE.test(String(category.id))) {
+      fail(`${label}: «id» debe ir en kebab-case.`);
+    }
+    if (!isNonEmptyString(category.name)) {
+      fail(`${label}: falta el nombre.`);
+    }
+    if (typeof category.number !== "number" || !Number.isInteger(category.number)) {
+      fail(`${label}: «number» debe ser un entero.`);
+    } else if (category.number < 1 || category.number > NUMERO_DE_CATEGORIAS) {
+      fail(`${label}: «number» debe estar entre 1 y ${NUMERO_DE_CATEGORIAS}.`);
+    }
+    if (!isHexColor(category.color)) {
+      fail(
+        `${label}: «color» debe ser un hexadecimal de seis dígitos. ` +
+          `Recibido: «${category.color}».`
+      );
+    }
+  });
+
+  /** @param {string} field */
+  const repetidos = (field) => {
+    /** @type {Map<string, number>} */
+    const vistos = new Map();
+    for (const category of categories) {
+      const clave = String(category[field]);
+      vistos.set(clave, (vistos.get(clave) || 0) + 1);
+    }
+    return [...vistos.entries()].filter(([, n]) => n > 1).map(([clave]) => clave);
+  };
+
+  for (const field of ["id", "number", "name"]) {
+    for (const valor of repetidos(field)) {
+      fail(`El catálogo repite «${field}»: ${valor}.`);
+    }
+  }
+
+  // El color es lo que hace legible el mapa al filtrar: dos categorías del
+  // mismo color serían indistinguibles.
+  for (const valor of repetidos("color")) {
+    fail(`Dos categorías comparten el color ${valor}: no se distinguirían en el mapa.`);
+  }
+
+  // Un nombre todavía sin decidir no es un error, pero conviene recordarlo.
+  const provisionales = categories.filter((c) => /^Categor[ií]a \d+$/.test(String(c.name)));
+  if (provisionales.length > 0) {
+    warn(
+      `${provisionales.length} categorías conservan su nombre provisional ` +
+        `(«Categoría N»). Pendiente de que el equipo confirme los nombres.`
+    );
   }
 }
 
@@ -330,8 +444,23 @@ function main() {
     process.exit(1);
   }
 
-  places.forEach(validatePlace);
+  const categories = Array.isArray(document.categories) ? document.categories : [];
+  validateCategories(categories);
+
+  const idsValidos = new Set(categories.map((c) => String(c.id)));
+  places.forEach((place, index) => validatePlace(place, index, idsValidos));
   validateCollection(places);
+
+  // Un predio sin categoría válida es invisible en cuanto se filtre.
+  const sinCategoria = places.filter(
+    (p) => !Array.isArray(p.categoryIds) || !p.categoryIds.some((id) => idsValidos.has(String(id)))
+  );
+  if (sinCategoria.length > 0) {
+    fail(
+      `${sinCategoria.length} predios no pertenecen a ninguna categoría válida: ` +
+        sinCategoria.map((p) => p.id).join(", ")
+    );
+  }
 
   for (const message of warnings) console.warn(`  aviso  ${message}`);
   for (const message of errors) console.error(`  ERROR  ${message}`);
@@ -340,6 +469,7 @@ function main() {
   const conFoto = places.filter((p) => Array.isArray(p.images) && p.images.length > 0).length;
   console.log(
     `\n${places.length} lugares (${published} publicados, ${conFoto} con fotografía) · ` +
+      `${categories.length} categorías · ` +
       `${errors.length} errores · ${warnings.length} avisos`
   );
 

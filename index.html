@@ -48,12 +48,52 @@
           <h1>
             ¿Qué es ahí?
             <span class="en">/ ¿What's there?</span>
-            <span class="tag">BOGOTÁ · v0.2</span>
+            <span class="tag">BOGOTÁ · v0.3</span>
           </h1>
         </div>
         <p>Toca un punto del mapa o pregunta por lo que tienes cerca.</p>
         <div class="palette-strip" aria-hidden="true"></div>
       </header>
+
+      <button
+        class="menu-toggle"
+        id="btnCategorias"
+        type="button"
+        aria-expanded="false"
+        aria-controls="categorias"
+        aria-label="Filtrar por categoría. Ahora se muestran todas."
+      >
+        <span class="bars" aria-hidden="true"></span>
+        <span class="badge" aria-hidden="true" hidden></span>
+      </button>
+
+      <div class="menu-backdrop" id="categoriasBackdrop"></div>
+
+      <!-- Menú lateral de categorías. Se despliega desde la izquierda; el
+           filtro es de selección múltiple y sin nada marcado equivale a todas. -->
+      <aside
+        class="menu"
+        id="categorias"
+        aria-label="Filtrar por categoría"
+        aria-hidden="true"
+      >
+        <div class="menu-head">
+          <h2>Categorías</h2>
+          <button class="close" id="categoriasClose" type="button" aria-label="Cerrar el menú de categorías">×</button>
+        </div>
+
+        <p class="menu-summary" id="categoriasResumen" role="status" aria-live="polite">
+          Se muestran las siete categorías.
+        </p>
+
+        <ul class="category-list" id="categoriasLista"><!-- render dinámico --></ul>
+
+        <div class="menu-foot">
+          <button class="reset" id="categoriasReset" type="button" disabled>
+            Mostrar todas
+          </button>
+        </div>
+      </aside>
 
       <div id="map" role="application" aria-label="Mapa del centro histórico de Bogotá"></div>
 
@@ -140,6 +180,7 @@
     <!-- Capa de servicios (5.3) -->
     <script src="src/services/geoService.js"></script>
     <script src="src/services/locationService.js"></script>
+    <script src="src/services/categoryService.js"></script>
 
     <!-- Capa de repositorios (5.4) -->
     <script src="src/repositories/placeRepository.js"></script>
@@ -149,6 +190,7 @@
     <!-- Capa de presentación (5.1) y funcionalidades (5.2) -->
     <script src="src/ui/toast.js"></script>
     <script src="src/features/map/mapView.js"></script>
+    <script src="src/features/categories/categoryMenu.js"></script>
     <script src="src/features/places/placeSheet.js"></script>
     <script src="src/features/location/whereAmI.js"></script>
 

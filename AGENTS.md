@@ -64,16 +64,20 @@ dependencias de desarrollo.
 
 1. Edita `public/data/places.js`, copiando la forma de una entrada existente.
 2. `id` y `slug` en kebab-case, sin tildes ni espacios: `casa-de-narino`.
-3. Color hexadecimal de seis dígitos, de la paleta de `src/styles/tokens.css`, y
-   distinto al de los demás lugares publicados. Emoji también distinto.
-4. Cita al menos una fuente real.
-5. Añade su fotografía en `public/fotos/<slug>.jpg` y rellena `images[0]` con
+3. Asígnale una de las siete categorías en `categoryIds`. Es obligatorio: un
+   predio sin categoría válida desaparece en cuanto alguien use el filtro, y
+   `npm run validate` lo rechaza. El color del marcador lo aporta la categoría;
+   los lugares ya no llevan `color`.
+4. Emoji distinto al de los demás lugares publicados: con el color agrupando
+   por categoría, el emoji es lo único que los diferencia en el mapa.
+5. Cita al menos una fuente real.
+6. Añade su fotografía en `public/fotos/<slug>.jpg` y rellena `images[0]` con
    `src`, `alt` y `credit`. Sin `alt` el validador falla; sin derechos de uso
    comprobados, la imagen no entra. Ver
    [`public/fotos/README.md`](public/fotos/README.md).
    Mientras no haya foto: `npm run fotos:placeholders` genera un provisional.
-6. `npm run check`. Corrige errores y lee los avisos.
-7. Rama `feature/lugar-<slug>`, Pull Request, y a revisión.
+7. `npm run check`. Corrige errores y lee los avisos.
+8. Rama `feature/lugar-<slug>`, Pull Request, y a revisión.
 
 Si el contenido aún no está verificado, ponlo en `status: "review"`: no
 aparecerá en el mapa, pero queda versionado y listo para promover.
@@ -84,6 +88,9 @@ aparecerá en el mapa, pero queda versionado y listo para promover.
 |---|---|
 | Cambiar un texto o añadir un lugar | `public/data/places.js` |
 | Una fotografía | `public/fotos/<slug>.jpg` + `images[0]` en `places.js` |
+| Renombrar una categoría | `categories[].name` en `places.js` — nada más depende de él |
+| Filtrar o contar por categoría | `src/services/categoryService.js` (puro) |
+| El menú lateral | `src/features/categories/categoryMenu.js` |
 | Cálculo geográfico | `src/services/geoService.js` (puro) |
 | Algo del dispositivo (GPS, almacenamiento) | `src/services/locationService.js` |
 | Nueva fuente de datos | `src/repositories/` con la interfaz de `placeRepository.js` |

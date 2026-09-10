@@ -6,7 +6,8 @@
  * nada más, porque el resto del código solo usa la interfaz que devuelve
  * `createMapView`.
  *
- * Depende de: app/namespace.js, app/config.js, utils/html.js
+ * Depende de: app/namespace.js, app/config.js, utils/html.js,
+ *             services/categoryService.js
  */
 
 (function (global) {
@@ -15,18 +16,26 @@
   const QEA = global.QEA;
   const { escapeHtml, isHexColor } = QEA.require("html");
   const { DEFAULT_ACCENT, MAP_CENTER, MAP_ZOOM, TILE_LAYER } = QEA.require("config");
+  const { primaryCategory } = QEA.require("categoryService");
 
   /**
-   * Color de acento utilizable de un lugar.
+   * Color de acento de un lugar: el de su categoría.
+   *
+   * Desde que existen las siete categorías, el color dejó de ser una propiedad
+   * del lugar y pasó a ser lo que agrupa el mapa: dos predios del mismo tipo se
+   * ven iguales, y al filtrar se entiende qué quedó.
    *
    * Un valor mal escrito —por ejemplo `"#7C8B4A;"`— se descarta aquí en lugar
    * de llegar al CSS, donde fallaba en silencio y solo en algunos sitios.
    *
    * @param {Place} place
+   * @param {Category[]} [categories]
    * @returns {string}
    */
-  function accentOf(place) {
-    return isHexColor(place.color) ? /** @type {string} */ (place.color) : DEFAULT_ACCENT;
+  function accentOf(place, categories) {
+    const category = categories ? primaryCategory(place, categories) : null;
+    const color = category ? category.color : undefined;
+    return isHexColor(color) ? /** @type {string} */ (color) : DEFAULT_ACCENT;
   }
 
   /**
@@ -37,6 +46,8 @@
    * }} options
    */
   function createMapView({ container, leaflet: L, onSelect }) {
+    /** @type {Category[]} */
+    let categories = [];
     const map = L.map(container, { zoomControl: false, attributionControl: true }).setView(
       MAP_CENTER,
       MAP_ZOOM.initial
@@ -57,10 +68,22 @@
 
     return {
       /**
-       * Dibuja los marcadores y encuadra el mapa sobre ellos.
-       * @param {Place[]} places
+       * Catálogo de categorías, del que sale el color de cada marcador.
+       * @param {Category[]} nextCategories
        */
-      setPlaces(places) {
+      setCategories(nextCategories) {
+        categories = nextCategories;
+      },
+
+      /**
+       * Dibuja los marcadores y encuadra el mapa sobre ellos.
+       *
+       * @param {Place[]} places
+       * @param {{ fit?: boolean }} [options] `fit: false` deja la vista donde
+       *   está. Al aplicar un filtro conviene reencuadrar; al abrir un lugar
+       *   concreto, no, porque pelearía con el `flyTo`.
+       */
+      setPlaces(places, options = {}) {
         for (const marker of markers.values()) marker.remove();
         markers.clear();
 
@@ -73,7 +96,7 @@
             // `escapeHtml` protege el atributo de estilo y el contenido: el
             // emoji y el color vienen de datos, no del código.
             html:
-              `<div class="poi-pin" style="--pin-color:${escapeHtml(accentOf(place))}">` +
+              `<div class="poi-pin" style="--pin-color:${escapeHtml(accentOf(place, categories))}">` +
               `<span>${escapeHtml(place.emoji || "📍")}</span></div>`,
             iconSize: [34, 34],
             iconAnchor: [17, 32]
@@ -96,7 +119,7 @@
           bounds.push([place.latitude, place.longitude]);
         }
 
-        if (bounds.length > 0) {
+        if (bounds.length > 0 && options.fit !== false) {
           map.fitBounds(bounds, { padding: [70, 70], maxZoom: MAP_ZOOM.initial });
         }
       },

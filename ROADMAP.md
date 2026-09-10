@@ -24,12 +24,15 @@ registrada como primer commit del repositorio.
 
 ## Siguiente
 
-### v0.3 — búsqueda, filtros y lista
+### v0.3 — búsqueda, filtros y lista ← **en curso**
 El primer objetivo con seis lugares en el mapa es poder encontrarlos sin
 depender del GPS.
 
+- ~~Filtro por categoría en un menú lateral.~~ **Hecho en la 0.3.0**, con las
+  siete categorías. Faltan los nombres definitivos y la adscripción real de
+  cada predio.
 - Lista de lugares accesible desde la cabecera, ordenable por cercanía.
-- Búsqueda por nombre y filtro por categoría.
+- Búsqueda por nombre.
 - ~~Ficha ampliada con imágenes.~~ **Hecho en la 0.2.2**; falta sustituir los
   marcadores de posición por fotografías reales.
 
@@ -73,6 +76,9 @@ Dominio definitivo, seguridad, rendimiento y operación.
 | El arranque bajo `file://` se verifica a mano | CI | v0.3 |
 | Sin tipos entre archivos (`QEA.require` devuelve `any`) | `src/` | al migrar a TypeScript |
 | `docs/product/contenido-por-verificar.md` con datos sin confirmar | contenido | continuo |
-| Las seis fotografías son marcadores de posición | `public/fotos/` | antes del piloto |
+| Cuatro de las seis fotografías son marcadores de posición | `public/fotos/` | antes del piloto |
+| Nombres y adscripción de las siete categorías, provisionales | `public/data/places.js` | pendiente del equipo |
+| El color de la categoría 7 no viene del PDF de marca | `src/styles/tokens.css` | antes del piloto |
+| El filtro no se refleja en la URL, así que no se puede compartir | `src/app/main.js` | v0.3 |
 | Sin licencia declarada en `package.json` | raíz | antes de publicar |
 | Carpetas `content/` y `supabase/` de la sección 10 aún sin crear | raíz | cuando haya qué poner en ellas |

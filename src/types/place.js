@@ -34,14 +34,31 @@
  * @property {number}   latitude           Grados decimales (WGS 84).
  * @property {number}   longitude          Grados decimales (WGS 84).
  * @property {string}   location           Dirección o referencia urbana.
- * @property {string[]} categories         Etiquetas temáticas.
+ * @property {string[]} categoryIds        Categorías de la taxonomía de siete
+ *   a las que pertenece el predio. Hoy siempre una; el arreglo permite que un
+ *   predio pertenezca a varias sin cambiar el modelo.
+ * @property {string[]} tags               Etiquetas editoriales libres que se
+ *   muestran como fichas en la ficha. No confundir con `categoryIds`.
  * @property {string[]} images             Rutas o URLs de imágenes.
  * @property {string[]} sources            Fuentes consultadas.
  * @property {PlaceStatus} status          Estado editorial.
  * @property {string}   createdAt          Fecha ISO (YYYY-MM-DD).
  * @property {string}   updatedAt          Fecha ISO (YYYY-MM-DD).
  * @property {string} [emoji]              Presentación: icono del marcador.
- * @property {string} [color]              Presentación: acento `#RRGGBB`.
+ */
+
+/**
+ * Una de las siete categorías en que se clasifican los predios.
+ *
+ * El catálogo vive en el documento de datos, no repartido por los lugares, para
+ * que exista una sola definición de qué categorías hay, en qué orden y de qué
+ * color. El color es lo que hace legible el mapa al filtrar.
+ *
+ * @typedef {Object} Category
+ * @property {string} id      Identificador estable, `categoria-1` … `categoria-7`.
+ * @property {number} number  Orden de presentación, 1 a 7.
+ * @property {string} name    Nombre visible.
+ * @property {string} color   Acento `#RRGGBB`, aplicado al marcador y a la ficha.
  */
 
 /**
@@ -76,6 +93,7 @@
  * @property {(options?: QueryOptions) => Promise<Place[]>} getAll
  * @property {(id: string, options?: QueryOptions) => Promise<Place|null>} getById
  * @property {(slug: string, options?: QueryOptions) => Promise<Place|null>} getBySlug
+ * @property {() => Promise<Category[]>} getCategories El catálogo de siete.
  * @property {() => Promise<Place[]>} refresh Vacía la caché y vuelve a cargar.
  */
 

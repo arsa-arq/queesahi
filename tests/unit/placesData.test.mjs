@@ -9,14 +9,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { embeddedPlaceRepository, html, types } from "../helpers/loadApp.mjs";
+import { categoryService, embeddedPlaceRepository, html, types } from "../helpers/loadApp.mjs";
 import "../../public/data/places.js";
 
 const { parsePlacesDocument } = embeddedPlaceRepository;
 const { isHexColor } = html;
 const { PLACE_STATUSES } = types;
+const { countByCategory, uncategorized, primaryCategory } = categoryService;
 
-const places = parsePlacesDocument(globalThis.__QEA_PLACES__);
+const documento = parsePlacesDocument(globalThis.__QEA_PLACES__);
+const places = documento.places;
+const categories = documento.categories;
 
 test("hay lugares publicados", () => {
   assert.ok(places.filter((p) => p.status === "published").length >= 5);
@@ -32,23 +35,57 @@ test("todos los identificadores van en kebab-case y son únicos", () => {
   assert.equal(new Set(places.map((p) => p.slug)).size, places.length);
 });
 
-test("todos los colores son hexadecimales de seis dígitos", () => {
+test("el catálogo tiene siete categorías, numeradas del 1 al 7", () => {
+  assert.equal(categories.length, 7);
+  assert.deepEqual(
+    [...categories].map((c) => c.number).sort((a, b) => a - b),
+    [1, 2, 3, 4, 5, 6, 7]
+  );
+});
+
+test("los colores del catálogo son hexadecimales válidos y distintos", () => {
+  // Dos categorías del mismo color serían indistinguibles en el mapa, que es
+  // justo lo que el filtro pretende hacer legible.
+  for (const category of categories) {
+    assert.ok(isHexColor(category.color), `color inválido en ${category.id}: ${category.color}`);
+  }
+  const colores = categories.map((c) => c.color);
+  assert.equal(new Set(colores).size, colores.length, "hay colores repetidos en el catálogo");
+});
+
+test("los identificadores del catálogo son únicos", () => {
+  const ids = categories.map((c) => c.id);
+  assert.equal(new Set(ids).size, ids.length);
+});
+
+test("los lugares publicados no repiten emoji", () => {
+  // El color agrupa por categoría; el emoji es lo único que distingue dos
+  // marcadores de la misma categoría.
+  const published = places.filter((p) => p.status === "published");
+  const emojis = published.map((p) => p.emoji).filter(Boolean);
+  assert.equal(new Set(emojis).size, emojis.length);
+});
+
+test("todo predio pertenece a una categoría del catálogo", () => {
+  assert.deepEqual(
+    uncategorized(places, categories).map((p) => p.id),
+    [],
+    "un predio fuera del catálogo desaparece en cuanto alguien filtre"
+  );
+});
+
+test("cada predio tiene un color resoluble a partir de su categoría", () => {
   for (const place of places) {
-    if (place.color === undefined) continue;
-    assert.ok(isHexColor(place.color), `color inválido en ${place.id}: ${place.color}`);
+    const category = primaryCategory(place, categories);
+    assert.ok(category, `${place.id} no resuelve categoría`);
+    assert.ok(isHexColor(category.color));
   }
 });
 
-test("los lugares publicados no repiten color ni emoji", () => {
-  const published = places.filter((p) => p.status === "published");
-  for (const field of ["color", "emoji"]) {
-    const values = published.map((p) => p[field]).filter(Boolean);
-    assert.equal(
-      new Set(values).size,
-      values.length,
-      `hay ${field} repetidos entre los lugares publicados`
-    );
-  }
+test("los recuentos por categoría suman el total de predios categorizados", () => {
+  const counts = countByCategory(places, categories);
+  const suma = Object.values(counts).reduce((a, b) => a + b, 0);
+  assert.equal(suma, places.length);
 });
 
 test("las coordenadas caen dentro de Bogotá", () => {

@@ -2,6 +2,66 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.3.0] — 2026-09-10
+
+### Añadido
+
+- **Siete categorías para clasificar los predios**, con su catálogo en
+  `public/data/places.js`: `id`, `number`, `name` y `color`. Los nombres son
+  provisionales («Categoría 1» … «Categoría 7») a la espera de que el equipo de
+  la Cátedra los confirme.
+- **Menú lateral de filtros.** Se abre con el botón de la esquina superior
+  izquierda. Selección múltiple que **suma**: marcar dos categorías muestra los
+  predios de ambas. Sin nada marcado se ven todos, que es lo que espera quien
+  abre el menú y no toca nada.
+- Cada fila del menú lleva su color, su nombre y el número de predios. Las
+  categorías vacías se atenúan pero siguen siendo pulsables: decir «aquí
+  todavía no hay nada» es información, y ocultarlas mentiría sobre el catálogo.
+- Contador sobre el botón cuando hay un filtro puesto, para que no se olvide
+  por qué el mapa tiene menos lugares.
+- `src/services/categoryService.js`: filtrado, recuentos y resolución de
+  categoría, en funciones puras. 11 pruebas nuevas.
+- `getCategories()` en el contrato del repositorio, que devuelve el catálogo
+  ordenado por número.
+- Reglas nuevas en `npm run validate`: el catálogo debe tener siete entradas con
+  `id`, `number`, `name` y `color` válidos y sin repetir; todo predio debe
+  pertenecer a una categoría existente; y avisa mientras los nombres sigan
+  siendo provisionales.
+
+### Cambiado
+
+- **El color del marcador ya no es del lugar: es de su categoría.** Es lo que
+  hace legible el mapa al filtrar — dos predios del mismo tipo se ven iguales.
+  El campo `color` desaparece de los lugares; el validador avisa si queda algún
+  resto.
+- **El campo `categories` de cada lugar pasa a llamarse `tags`.** Eran quince
+  etiquetas editoriales libres («Historia», «Mirador»), un concepto distinto de
+  la taxonomía de siete. Siguen mostrándose en la ficha; no filtran.
+- La ficha muestra primero su categoría, con el color de esta, y detrás las
+  etiquetas en gris.
+- `schemaVersion` del documento de datos sube a **2**. El formato 1 se sigue
+  leyendo: devuelve un catálogo vacío.
+- Séptimo color de marca, `--brand-plum: #6F4A7F`. **Provisional**: la paleta
+  del PDF define cinco acentos más dos azules, y hacía falta uno más.
+- El botón «¿Qué es ahí?» busca entre los predios visibles, no entre todos: si
+  alguien filtró por una categoría, preguntar qué hay cerca debe responder
+  dentro de ella.
+
+### Corregido
+
+- **El menú y la ficha se pisaban el foco.** Los dos marcan como `inert` los
+  mismos elementos, y el botón del menú no estaba en la lista de la ficha: se
+  podía abrir el menú sobre una ficha abierta y, al cerrarlo, el mapa dejaba de
+  ser inerte mientras el diálogo seguía abierto. Ahora el botón queda inerte
+  con la ficha abierta, y abrir una ficha cierra el menú.
+
+### Pendiente
+
+Los nombres de las siete categorías y la adscripción de cada predio son
+provisionales: la asignación actual reparte un predio por categoría conservando
+el color que cada lugar ya tenía, sin criterio temático. Detalle en
+`docs/product/contenido-por-verificar.md`.
+
 ## [0.2.3] — 2026-09-08
 
 ### Corregido

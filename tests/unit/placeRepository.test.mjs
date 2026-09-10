@@ -30,6 +30,11 @@ const FIXTURE = [
   place("archivado", "archived")
 ];
 
+const CATEGORIAS = [
+  { id: "categoria-2", number: 2, name: "Categoría 2", color: "#E0951E" },
+  { id: "categoria-1", number: 1, name: "Categoría 1", color: "#C74A2C" }
+];
+
 test("getAll: por defecto solo devuelve lo publicado", async () => {
   const repository = createInMemoryPlaceRepository(FIXTURE);
   const places = await repository.getAll();
@@ -70,7 +75,7 @@ test("la carga se hace una sola vez y refresh() la repite", async () => {
   let loads = 0;
   const repository = createPlaceRepository(async () => {
     loads += 1;
-    return FIXTURE;
+    return { places: FIXTURE, categories: CATEGORIAS };
   });
 
   await Promise.all([repository.getAll(), repository.getAll(), repository.getById("publicado")]);
@@ -85,7 +90,7 @@ test("un fallo de carga no se queda cacheado", async () => {
   const repository = createPlaceRepository(async () => {
     attempts += 1;
     if (attempts === 1) throw new Error("datos corruptos");
-    return FIXTURE;
+    return { places: FIXTURE, categories: CATEGORIAS };
   });
 
   await assert.rejects(() => repository.getAll(), /datos corruptos/);
@@ -102,8 +107,34 @@ test("el repositorio en memoria no comparte referencias con quien lo construye",
 });
 
 test("parsePlacesDocument: acepta el envoltorio y el arreglo suelto", () => {
-  assert.equal(parsePlacesDocument({ schemaVersion: 1, places: FIXTURE }).length, 4);
-  assert.equal(parsePlacesDocument(FIXTURE).length, 4);
+  const conEnvoltorio = parsePlacesDocument({ schemaVersion: 2, places: FIXTURE });
+  assert.equal(conEnvoltorio.places.length, 4);
+  assert.deepEqual(conEnvoltorio.categories, []);
+
+  const suelto = parsePlacesDocument(FIXTURE);
+  assert.equal(suelto.places.length, 4);
+  assert.deepEqual(suelto.categories, [], "el formato antiguo no traía catálogo");
+});
+
+test("parsePlacesDocument: devuelve el catálogo cuando viene", () => {
+  const doc = parsePlacesDocument({ schemaVersion: 2, places: FIXTURE, categories: CATEGORIAS });
+  assert.equal(doc.categories.length, 2);
+});
+
+test("getCategories: devuelve el catálogo ordenado por número", async () => {
+  // En el archivo pueden estar en cualquier orden; el menú lateral tiene que
+  // presentarlas siempre igual.
+  const repository = createInMemoryPlaceRepository(FIXTURE, CATEGORIAS);
+  const categorias = await repository.getCategories();
+  assert.deepEqual(
+    categorias.map((c) => c.number),
+    [1, 2]
+  );
+});
+
+test("getCategories: vacío si el documento no trae catálogo", async () => {
+  const repository = createInMemoryPlaceRepository(FIXTURE);
+  assert.deepEqual(await repository.getCategories(), []);
 });
 
 test("parsePlacesDocument: rechaza un formato más nuevo del que entiende", () => {
@@ -116,7 +147,7 @@ test("parsePlacesDocument: rechaza basura", () => {
 });
 
 test("repositorio embebido: lee el documento que se le pasa", async () => {
-  const repository = createEmbeddedPlaceRepository({ schemaVersion: 1, places: FIXTURE });
+  const repository = createEmbeddedPlaceRepository({ schemaVersion: 2, places: FIXTURE });
   const places = await repository.getAll();
   assert.deepEqual(
     places.map((p) => p.id),
@@ -132,7 +163,7 @@ test("repositorio embebido: explica qué falta si no se cargaron los datos", asy
 
 test("repositorio embebido: usa el global cuando no se le pasa nada", async () => {
   const previous = globalThis.__QEA_PLACES__;
-  globalThis.__QEA_PLACES__ = { schemaVersion: 1, places: FIXTURE };
+  globalThis.__QEA_PLACES__ = { schemaVersion: 2, places: FIXTURE };
   try {
     const repository = createEmbeddedPlaceRepository();
     assert.equal((await repository.getAll()).length, 1);

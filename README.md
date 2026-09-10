@@ -4,7 +4,7 @@ Exploración urbana geolocalizada del centro histórico de Bogotá. Abres el map
 pulsas **«¿Qué es ahí?»** y la aplicación te cuenta qué es el lugar que tienes
 más cerca: qué pasó allí, por qué importa y qué mirar cuando estés delante.
 
-Proyecto de la Cátedra Bogotá. Versión **0.2**.
+Proyecto de la Cátedra Bogotá. Versión **0.3**.
 
 ## Abrirlo
 
@@ -57,6 +57,8 @@ funciona— está en
   la ficha del lugar más cercano.
 - Fotografía fija en la cabecera de cada ficha: el texto se desliza por debajo
   al desplazarse, y la imagen no se mueve.
+- Siete categorías con filtro en un menú lateral. El color del marcador es el
+  de su categoría, de modo que el mapa se lee agrupado.
 - Enlaces compartibles por lugar: `…/#/lugar/plaza-de-bolivar`. El botón
   «atrás» del navegador cierra la ficha.
 - Última posición conocida guardada en `localStorage`, para responder aunque el
@@ -110,6 +112,36 @@ licencia, que no son negociables— está en
 Si una imagen falta o no carga, la ficha no se rompe: vuelve al encabezado con
 el degradado de marca.
 
+## Categorías
+
+Los predios se clasifican en **siete categorías**. El catálogo vive en
+`public/data/places.js`, junto a los lugares:
+
+```js
+"categories": [
+  { "id": "categoria-1", "number": 1, "name": "Categoría 1", "color": "#C74A2C" },
+  …
+]
+```
+
+Cada predio declara a cuál pertenece con `categoryIds`. Es un arreglo, así que
+un predio podrá estar en varias el día que haga falta, sin cambiar el modelo;
+hoy todos tienen una.
+
+El menú lateral —el botón de la esquina superior izquierda— filtra por
+categoría. La selección es múltiple y suma: marcar dos muestra los predios de
+ambas. Sin nada marcado se ven todos.
+
+**Los nombres son provisionales.** Se llaman «Categoría 1» … «Categoría 7» a la
+espera de que el equipo de la Cátedra los confirme, y la adscripción de cada
+predio también. Cambiar un nombre es editar el campo `name` del catálogo; nada
+más depende de él. Ver
+[`docs/product/contenido-por-verificar.md`](docs/product/contenido-por-verificar.md).
+
+No confundir `categoryIds` con `tags`: las etiquetas editoriales libres
+—«Historia», «Mirador», «Arqueología»— siguen existiendo y se muestran en la
+ficha, pero no filtran nada.
+
 ## Paleta de marca
 
 Definida como variables CSS en `src/styles/tokens.css`. Ningún otro archivo
@@ -117,17 +149,22 @@ escribe un color literal.
 
 | Rol | Hex | Uso |
 |---|---|---|
-| Azul principal | `#04437F` | Logo, botón, marcador de usuario, Academia Colombiana de Historia |
+| Azul principal | `#04437F` | Logo, botón, marcador de usuario, Categoría 6 |
 | Azul profundo | `#04305C` | Fondo, avisos, telón de la ficha |
-| Rojo ladrillo | `#C74A2C` | Plaza de Bolívar |
-| Naranja ámbar | `#E0951E` | Museo del Oro |
-| Verde oliva | `#7C8B4A` | Cerro de Monserrate |
-| Teal | `#05707F` | Chorro de Quevedo, títulos de sección |
-| Índigo | `#3C5393` | Teatro Colón |
+| Rojo ladrillo | `#C74A2C` | Categoría 1 |
+| Naranja ámbar | `#E0951E` | Categoría 2 |
+| Verde oliva | `#7C8B4A` | Categoría 3 |
+| Teal | `#05707F` | Categoría 5, títulos de sección |
+| Índigo | `#3C5393` | Categoría 4 |
+| Ciruela | `#6F4A7F` | Categoría 7 — **provisional**, no viene del PDF de marca |
 
-Los cinco acentos aparecen juntos en la cinta bajo la cabecera y al pie del
-banner de cada ficha. Cada lugar publicado usa un color y un emoji distintos;
-`npm run validate` avisa si se repiten.
+Los cinco acentos originales aparecen juntos en la cinta bajo la cabecera y al
+pie del banner de cada ficha.
+
+Desde que existen las categorías, **el color agrupa, no distingue**: dos predios
+de la misma categoría comparten color a propósito. Lo que los diferencia en el
+mapa es el emoji, y `npm run validate` avisa si dos lugares publicados repiten
+el suyo o si dos categorías comparten color.
 
 ## Añadir un lugar
 
