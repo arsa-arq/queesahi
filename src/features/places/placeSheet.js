@@ -15,10 +15,48 @@
   "use strict";
 
   const QEA = global.QEA;
-  const { html, toHtmlString, firstImage } = QEA.require("html");
+  const { html, toHtmlString, firstImage, isHexColor } = QEA.require("html");
   const { formatDistance } = QEA.require("geoService");
   const { accentOf } = QEA.require("mapView");
-  const { primaryCategory } = QEA.require("categoryService");
+  const { layersOf } = QEA.require("categoryService");
+
+  /**
+   * Color seguro de una categoría para interpolar en `style`.
+   * @param {Category} category
+   * @returns {string}
+   */
+  function colorOf(category) {
+    return isHexColor(category.color) ? category.color : "#04437F";
+  }
+
+  /**
+   * Una capa registrada: su nombre y subtítulo, la pregunta orientadora que
+   * responde, lo registrado y, si las hay, sus evidencias y fuentes propias.
+   *
+   * La pregunta va antes del texto porque es lo que da sentido a lo que sigue:
+   * sin ella, «Histórica» y un párrafo no dicen desde dónde se está mirando.
+   *
+   * @param {{ category: Category, layer: PlaceLayer }} entry
+   */
+  function layerSection({ category, layer }) {
+    const evidence = (layer.evidence || []).filter((item) => typeof item === "string" && item.trim());
+    const sources = (layer.sources || []).filter((item) => typeof item === "string" && item.trim());
+    return html`
+      <section class="layer-block" data-layer-section="${category.id}" style="--cat-color:${colorOf(category)}">
+        <h4>
+          <span class="layer-name">${category.name}</span>
+          ${category.layer ? html`<span class="layer-sub">${category.layer}</span>` : ""}
+        </h4>
+        ${category.question ? html`<p class="layer-question">${category.question}</p>` : ""}
+        <p class="layer-text">${layer.text}</p>
+        ${evidence.length
+          ? html`<p class="layer-meta"><strong>Evidencia:</strong> ${evidence.join(" · ")}</p>`
+          : ""}
+        ${sources.length
+          ? html`<p class="layer-meta"><strong>Fuentes:</strong> ${sources.join(" · ")}</p>`
+          : ""}
+      </section>`;
+  }
 
   /**
    * Enlace de navegación paso a paso. Las coordenadas se codifican como
@@ -174,16 +212,28 @@
         lastFocused = document.activeElement;
 
         const accent = accentOf(place, categories);
-        const category = primaryCategory(place, categories);
+        const registered = layersOf(place, categories);
         const distance =
           typeof options.distance === "number"
             ? html`<span class="chip dist">a ${formatDistance(options.distance)} de ti</span>`
             : "";
-        // La categoría va primero y con su color: es la clasificación del
-        // predio, no una etiqueta más. Las «tags» editoriales van detrás, en
-        // gris, para que se distinga de un vistazo cuál es cuál.
-        const categoryChip = category
-          ? html`<span class="chip category" style="--cat-color:${accent}">${category.name}</span>`
+        // Un acceso por capa registrada, con su color. Son botones y no
+        // enlaces `#…` a propósito: cambiar el hash dispararía el enrutador
+        // de `#/lugar/<slug>` y cerraría la ficha.
+        const layerChips = registered.map(
+          ({ category }) =>
+            html`<button type="button" class="chip layer-jump" data-layer-jump="${category.id}" style="--cat-color:${colorOf(category)}">${category.name}</button>`
+        );
+
+        const layersSection = registered.length
+          ? html`
+            <section class="layers">
+              <h3 class="layers-title">
+                Capas de lectura
+                <span class="layers-count">${registered.length} de ${categories.length}</span>
+              </h3>
+              ${registered.map(layerSection)}
+            </section>`
           : "";
         const tagChips = (place.tags || []).map((tag) => html`<span class="chip">${tag}</span>`);
         const sources = (place.sources || []).join(" · ");
@@ -195,14 +245,14 @@
         renderPhoto(banner, sheet, image, place.name);
 
         body.innerHTML = toHtmlString(html`
-          <div class="meta">${distance}${categoryChip}${tagChips}</div>
+          <div class="meta">${distance}${layerChips}${tagChips}</div>
           <p class="summary">${place.summary}</p>
           <p class="location"><span aria-hidden="true">📌</span> ${place.location}</p>
           <section class="block"><p>${place.description}</p></section>
           ${block("Por qué importa", place.whyItMatters)}
           ${block("Míralo de cerca", place.lookCloser)}
-          ${block("Contexto histórico", place.historicalContext)}
           ${block("Curiosidad", place.curiosity)}
+          ${layersSection}
           <div class="actions">
             <a href="${directionsUrl(place)}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>
             <a class="ghost" href="${osmUrl(place)}" target="_blank" rel="noopener noreferrer">Ver en OSM</a>
@@ -212,6 +262,19 @@
             ? html`<p class="sources credit"><strong>Fotografía:</strong> ${image.credit}</p>`
             : ""}
         `);
+
+        // Los accesos rápidos llevan a la sección de cada capa. El margen de
+        // desplazamiento (CSS `scroll-margin-top`) evita que la sección quede
+        // escondida bajo la fotografía fija.
+        for (const button of body.querySelectorAll("[data-layer-jump]")) {
+          button.addEventListener("click", () => {
+            const id = button.getAttribute("data-layer-jump") || "";
+            const target = body.querySelector(`[data-layer-section="${CSS.escape(id)}"]`);
+            if (!target) return;
+            const reduce = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+          });
+        }
 
         // El cuerpo conserva el desplazamiento de la ficha anterior si no se
         // reinicia: al abrir un lugar nuevo hay que empezar por arriba.

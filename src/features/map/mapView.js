@@ -16,7 +16,7 @@
   const QEA = global.QEA;
   const { escapeHtml, isHexColor } = QEA.require("html");
   const { DEFAULT_ACCENT, MAP_CENTER, MAP_ZOOM, TILE_LAYER } = QEA.require("config");
-  const { primaryCategory } = QEA.require("categoryService");
+  const { primaryCategory, layersOf } = QEA.require("categoryService");
 
   /**
    * Color de acento de un lugar: el de su categoría.
@@ -39,6 +39,33 @@
   }
 
   /**
+   * Anillo del marcador: un tramo del color de cada capa registrada, en el
+   * orden del catálogo (ADR 0006).
+   *
+   * Con una capa sale un color sólido —el marcador de siempre—; con varias, un
+   * degradado cónico por tramos que deja ver de un vistazo desde qué capas se
+   * ha leído el lugar; sin ninguna, el azul de marca.
+   *
+   * @param {Place} place
+   * @param {Category[]} categories
+   * @returns {string} Valor válido para la propiedad CSS `background`.
+   */
+  function ringOf(place, categories) {
+    const colors = layersOf(place, categories)
+      .map(({ category }) => category.color)
+      .filter((color) => isHexColor(color));
+
+    if (colors.length === 0) return DEFAULT_ACCENT;
+    if (colors.length === 1) return colors[0];
+
+    const step = 100 / colors.length;
+    const stops = colors.map(
+      (color, i) => `${color} ${(i * step).toFixed(2)}% ${((i + 1) * step).toFixed(2)}%`
+    );
+    return `conic-gradient(${stops.join(", ")})`;
+  }
+
+  /**
    * @param {{
    *   container: HTMLElement,
    *   leaflet: any,
@@ -58,6 +85,60 @@
       maxZoom: MAP_ZOOM.max,
       attribution: TILE_LAYER.attribution
     }).addTo(map);
+
+    /**
+     * Último encuadre que no pudo ejecutarse porque el mapa aún no tenía
+     * superficie. Se reintenta en cuanto la tenga.
+     * @type {(() => void)|null}
+     */
+    let pendingFrame = null;
+
+    /**
+     * ¿Tiene el mapa superficie en pantalla?
+     *
+     * Leaflet guarda en caché el tamaño del contenedor. Si el mapa se crea
+     * cuando el contenedor mide 0 —pestaña en segundo plano, panel oculto— y
+     * después crece sin que Leaflet se entere, `flyTo` y `fitBounds` dividen
+     * por ese 0 y lanzan «Invalid LatLng object: (NaN, NaN)». Por eso se
+     * refresca la caché antes de cada encuadre.
+     *
+     * @returns {boolean}
+     */
+    function hasSurface() {
+      map.invalidateSize({ pan: false });
+      const size = map.getSize();
+      return size.x > 0 && size.y > 0;
+    }
+
+    /**
+     * Ejecuta un encuadre (`fitBounds`, `flyTo`) sin dejar que un fallo tumbe
+     * la aplicación. Encuadrar es cosmético: antes, un NaN aquí durante el
+     * arranque terminaba en «La aplicación no pudo iniciarse». Si el mapa aún
+     * no tiene superficie, el encuadre se aplaza hasta que la tenga.
+     *
+     * @param {() => void} action
+     */
+    function frame(action) {
+      if (!hasSurface()) {
+        pendingFrame = action;
+        return;
+      }
+      pendingFrame = null;
+      try {
+        action();
+      } catch (error) {
+        console.warn("[¿Qué es ahí?] no se pudo encuadrar el mapa", error);
+      }
+    }
+
+    function flushPendingFrame() {
+      if (pendingFrame && hasSurface()) frame(pendingFrame);
+    }
+
+    map.on("resize", flushPendingFrame);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") flushPendingFrame();
+    });
 
     /** @type {Map<string, any>} */
     const markers = new Map();
@@ -95,9 +176,12 @@
             className: "",
             // `escapeHtml` protege el atributo de estilo y el contenido: el
             // emoji y el color vienen de datos, no del código.
+            // El anillo es el fondo del marcador y el relleno blanco va
+            // dentro: así el borde puede ser un degradado por tramos, cosa
+            // que un `border` no admite.
             html:
-              `<div class="poi-pin" style="--pin-color:${escapeHtml(accentOf(place, categories))}">` +
-              `<span>${escapeHtml(place.emoji || "📍")}</span></div>`,
+              `<div class="poi-pin" style="--ring:${escapeHtml(ringOf(place, categories))}">` +
+              `<div class="poi-fill"><span>${escapeHtml(place.emoji || "📍")}</span></div></div>`,
             iconSize: [34, 34],
             iconAnchor: [17, 32]
           });
@@ -120,7 +204,7 @@
         }
 
         if (bounds.length > 0 && options.fit !== false) {
-          map.fitBounds(bounds, { padding: [70, 70], maxZoom: MAP_ZOOM.initial });
+          frame(() => map.fitBounds(bounds, { padding: [70, 70], maxZoom: MAP_ZOOM.initial }));
         }
       },
 
@@ -129,7 +213,9 @@
        * @param {Place} place
        */
       focusPlace(place) {
-        map.flyTo([place.latitude, place.longitude], MAP_ZOOM.focus, { duration: 0.6 });
+        frame(() =>
+          map.flyTo([place.latitude, place.longitude], MAP_ZOOM.focus, { duration: 0.6 })
+        );
       },
 
       /**
@@ -175,5 +261,5 @@
     };
   }
 
-  QEA.define("mapView", { createMapView, accentOf });
+  QEA.define("mapView", { createMapView, accentOf, ringOf });
 })(globalThis);

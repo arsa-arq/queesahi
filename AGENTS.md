@@ -64,10 +64,11 @@ dependencias de desarrollo.
 
 1. Edita `public/data/places.js`, copiando la forma de una entrada existente.
 2. `id` y `slug` en kebab-case, sin tildes ni espacios: `casa-de-narino`.
-3. Asígnale una de las siete categorías en `categoryIds`. Es obligatorio: un
-   predio sin categoría válida desaparece en cuanto alguien use el filtro, y
-   `npm run validate` lo rechaza. El color del marcador lo aporta la categoría;
-   los lugares ya no llevan `color`.
+3. Registra su contenido en **al menos una** de las siete capas, dentro de
+   `layers`. Cada capa lleva `text` —la respuesta a su pregunta orientadora—
+   y, si hay, `evidence` y `sources`. Puede tener una, varias o las siete. Un
+   lugar publicado sin ninguna capa no pasa `npm run validate`. Las preguntas
+   de cada capa están en `docs/product/matriz-de-categorias.md`.
 4. Emoji distinto al de los demás lugares publicados: con el color agrupando
    por categoría, el emoji es lo único que los diferencia en el mapa.
 5. Cita al menos una fuente real.
@@ -89,6 +90,7 @@ aparecerá en el mapa, pero queda versionado y listo para promover.
 | Cambiar un texto o añadir un lugar | `public/data/places.js` |
 | Una fotografía | `public/fotos/<slug>.jpg` + `images[0]` en `places.js` |
 | Renombrar una categoría | `categories[].name` en `places.js` — nada más depende de él |
+| Registrar una capa en un lugar | `layers["categoria-N"]` del lugar en `places.js` |
 | Filtrar o contar por categoría | `src/services/categoryService.js` (puro) |
 | El menú lateral | `src/features/categories/categoryMenu.js` |
 | Cálculo geográfico | `src/services/geoService.js` (puro) |

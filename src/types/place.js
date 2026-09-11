@@ -29,14 +29,18 @@
  * @property {string}   description        Descripción principal.
  * @property {string} [whyItMatters]       Por qué importa.
  * @property {string} [lookCloser]         Qué mirar de cerca al estar allí.
- * @property {string} [historicalContext]  Contexto histórico.
+ * @property {string} [historicalContext]  Obsoleto: su contenido vive ahora en
+ *   la capa Histórica, `layers["categoria-1"]`.
  * @property {string} [curiosity]          Dato curioso.
  * @property {number}   latitude           Grados decimales (WGS 84).
  * @property {number}   longitude          Grados decimales (WGS 84).
  * @property {string}   location           Dirección o referencia urbana.
- * @property {string[]} categoryIds        Categorías de la taxonomía de siete
- *   a las que pertenece el predio. Hoy siempre una; el arreglo permite que un
- *   predio pertenezca a varias sin cambiar el modelo.
+ * @property {Record<string, PlaceLayer>} [layers] Lo registrado desde cada
+ *   capa de lectura, por id de categoría. Un lugar pertenece a una capa si y
+ *   solo si tiene contenido en ella; puede tener una, varias o las siete
+ *   (ADR 0006).
+ * @property {string[]} [categoryIds]      Obsoleto desde el ADR 0006. Solo se
+ *   lee como respaldo de documentos antiguos.
  * @property {string[]} tags               Etiquetas editoriales libres que se
  *   muestran como fichas en la ficha. No confundir con `categoryIds`.
  * @property {string[]} images             Rutas o URLs de imágenes.
@@ -69,6 +73,19 @@
  * @property {string} [question] Pregunta orientadora para leer un predio.
  * @property {string} [studies] Qué estudia esta capa.
  * @property {string} [evidence] Evidencia o producto esperado.
+ */
+
+/**
+ * Lo registrado sobre un lugar desde una capa de lectura.
+ *
+ * `text` responde a la pregunta orientadora de la capa. `evidence` y `sources`
+ * son opcionales: las fuentes generales del lugar siguen en `Place.sources`, y
+ * estas son las que sostienen específicamente esta lectura.
+ *
+ * @typedef {Object} PlaceLayer
+ * @property {string}   text        Respuesta a la pregunta orientadora.
+ * @property {string[]} [evidence]  Evidencias o productos que la sostienen.
+ * @property {string[]} [sources]   Fuentes específicas de esta capa.
  */
 
 /**

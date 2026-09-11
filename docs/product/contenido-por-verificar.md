@@ -43,24 +43,14 @@ Civilidad y Capa inusual—, con su capa de ciudad, eje, pregunta orientadora,
 qué estudia y evidencia. Ver
 [`matriz-de-categorias.md`](matriz-de-categorias.md).
 
-**La adscripción de cada predio: pendiente.** La asignación actual es arbitraria: se
-repartió un predio por categoría, de la 1 a la 6, conservando el color que cada
-lugar ya tenía para que el mapa no cambiara de aspecto. **No responde a ningún
-criterio temático.** La categoría 7 quedó vacía a propósito.
+**La adscripción de cada predio: resuelta por el modelo.** Desde el 2026-09-11
+un lugar pertenece a una capa si y solo si tiene contenido registrado en ella
+(ADR 0006). La asignación arbitraria anterior se descartó. Hoy los seis lugares
+tienen la capa Histórica y ninguna otra.
 
-Ahora que las categorías tienen nombre, la arbitrariedad se nota:
-
-| Predio | Quedó en | ¿Tiene sentido? |
-|---|---|---|
-| Plaza de Bolívar | 1. Histórica | Plausible, por casualidad |
-| Museo del Oro | 2. Institucional | Dudoso: es una institución, pero se lee mejor desde lo histórico o lo poblacional |
-| Cerro de Monserrate | 3. Poblacional | Dudoso |
-| Teatro Colón | 4. Territorial | Poco defendible |
-| Chorro de Quevedo | 5. Bienestar | Dudoso |
-| Academia Colombiana de Historia | 6. Civilidad | Dudoso |
-
-Reasignarlos exige criterio editorial, no técnico: hay que decidir desde qué
-capa se quiere que cada predio se lea.
+**Pendiente: registrar las otras seis capas.** Es trabajo de contenido, no de
+código. La guía de cada capa —pregunta, alcance, evidencia— está en
+[`matriz-de-categorias.md`](matriz-de-categorias.md).
 
 **El color de la categoría 7** (`#6F4A7F`, ciruela) tampoco viene del PDF de
 marca: la paleta original define cinco acentos más dos azules, y hacía falta un

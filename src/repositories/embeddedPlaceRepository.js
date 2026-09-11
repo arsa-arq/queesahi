@@ -19,7 +19,7 @@
   const { createPlaceRepository, PlaceRepositoryError } = QEA.require("placeRepository");
 
   /** Versión del formato de datos que este código sabe leer. */
-  const SUPPORTED_SCHEMA_VERSION = 2;
+  const SUPPORTED_SCHEMA_VERSION = 3;
 
   /** Nombre de la variable global que deja `public/data/places.js`. */
   const GLOBAL_KEY = "__QEA_PLACES__";

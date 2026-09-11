@@ -14,7 +14,7 @@
  */
 
 globalThis.__QEA_PLACES__ = {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "updatedAt": "2026-09-11",
   "categories": [
     {
@@ -105,7 +105,6 @@ globalThis.__QEA_PLACES__ = {
       "description": "Plaza principal fundacional de la ciudad, rodeada por el Capitolio Nacional, la Catedral Primada, el Palacio Liévano (Alcaldía Mayor), el Palacio de Justicia y el edificio del antiguo Cabildo. Es un rectángulo despejado de piso duro donde confluyen el poder legislativo, judicial, ejecutivo local y eclesiástico.",
       "whyItMatters": "Aquí se concentra la vida cívica del país: marchas, conciertos, posesiones presidenciales, mercados y celebraciones. El monumento a Simón Bolívar, inaugurado en 1846, fue la primera estatua pública de Bogotá.",
       "lookCloser": "Observa el choque de estilos alrededor de la plaza: el Capitolio neoclásico de fachada dórica, el Palacio de Justicia moderno reconstruido tras 1985, la Catedral neoclásica y el Palacio Liévano de aire francés.",
-      "historicalContext": "En este solar estuvo la plaza mayor de la Santa Fe colonial desde 1539. Fue mercado público, plaza de toros y sitio de ejecuciones. Se llamó Plaza de la Constitución antes de tomar el nombre del Libertador.",
       "curiosity": "El diseño actual, sobrio y sin jardines, es de 1960, obra del arquitecto Fernando Martínez Sanabria. Antes la plaza tenía prados, árboles y una reja perimetral.",
       "latitude": 4.59808,
       "longitude": -74.07605,
@@ -115,9 +114,13 @@ globalThis.__QEA_PLACES__ = {
         "Política",
         "Espacio público"
       ],
-      "categoryIds": [
-        "categoria-1"
-      ],
+      "layers": {
+        "categoria-1": {
+          "text": "En este solar estuvo la plaza mayor de la Santa Fe colonial desde 1539. Fue mercado público, plaza de toros y sitio de ejecuciones. Se llamó Plaza de la Constitución antes de tomar el nombre del Libertador.",
+          "evidence": [],
+          "sources": []
+        }
+      },
       "images": [
         {
           "src": "public/fotos/plaza-de-bolivar.jpg",
@@ -131,7 +134,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-10"
+      "updatedAt": "2026-09-11"
     },
     {
       "id": "museo-del-oro",
@@ -142,7 +145,6 @@ globalThis.__QEA_PLACES__ = {
       "description": "Museo del Banco de la República que reúne unas 34.000 piezas de oro y tumbaga y cerca de 25.000 objetos en cerámica, piedra, concha, hueso y textil, de culturas como Muisca, Quimbaya, Calima, Zenú, Tairona, Tolima y Nariño.",
       "whyItMatters": "Transformó la manera en que Colombia entiende su pasado indígena: el oro deja de leerse como riqueza y pasa a entenderse como un lenguaje simbólico, ritual y político de las sociedades prehispánicas.",
       "lookCloser": "Busca la Balsa Muisca, hallada en 1969 en una cueva en Pasca. Representa la ceremonia de El Dorado: el cacique cubierto de polvo de oro navegando la laguna de Guatavita con sus sacerdotes.",
-      "historicalContext": "El Banco de la República compró en 1939 su primera pieza, el poporo Quimbaya, para frenar la fundición y la exportación del patrimonio arqueológico. Esa compra dio origen a la colección.",
       "curiosity": "La sala llamada «La Ofrenda» es un recinto oscuro y circular que se ilumina poco a poco, recreando la entrada ritual a un espacio sagrado lleno de piezas votivas.",
       "latitude": 4.60193,
       "longitude": -74.07216,
@@ -152,9 +154,13 @@ globalThis.__QEA_PLACES__ = {
         "Arqueología",
         "Cultura"
       ],
-      "categoryIds": [
-        "categoria-2"
-      ],
+      "layers": {
+        "categoria-1": {
+          "text": "El Banco de la República compró en 1939 su primera pieza, el poporo Quimbaya, para frenar la fundición y la exportación del patrimonio arqueológico. Esa compra dio origen a la colección.",
+          "evidence": [],
+          "sources": []
+        }
+      },
       "images": [
         {
           "src": "public/fotos/museo-del-oro.jpeg",
@@ -168,7 +174,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-10"
+      "updatedAt": "2026-09-11"
     },
     {
       "id": "cerro-de-monserrate",
@@ -179,7 +185,6 @@ globalThis.__QEA_PLACES__ = {
       "description": "En la cima está el santuario del Señor Caído, meta de peregrinación. Se sube por funicular, por teleférico o por un camino peatonal empedrado. Desde el mirador se abarca casi toda la sabana de Bogotá.",
       "whyItMatters": "Es el principal lugar de peregrinación de la ciudad y una referencia visual permanente: se ve desde casi cualquier punto de Bogotá y orienta a quien camina por el centro.",
       "lookCloser": "Desde el mirador se distingue la retícula del centro histórico, la línea de los cerros orientales y, en días despejados, el páramo de Sumapaz hacia el sur.",
-      "historicalContext": "La ermita empezó a construirse hacia 1650. El funicular funciona desde 1929 y el teleférico desde 1955; antes solo se subía a pie o a lomo de mula.",
       "curiosity": "El sendero de subida tiene cerca de 1.500 escalones. Los fines de semana lo recorren miles de personas, muchas rezando el vía crucis a lo largo del camino.",
       "latitude": 4.6057,
       "longitude": -74.0562,
@@ -189,9 +194,13 @@ globalThis.__QEA_PLACES__ = {
         "Mirador",
         "Naturaleza"
       ],
-      "categoryIds": [
-        "categoria-3"
-      ],
+      "layers": {
+        "categoria-1": {
+          "text": "La ermita empezó a construirse hacia 1650. El funicular funciona desde 1929 y el teleférico desde 1955; antes solo se subía a pie o a lomo de mula.",
+          "evidence": [],
+          "sources": []
+        }
+      },
       "images": [
         {
           "src": "public/fotos/cerro-de-monserrate.png",
@@ -205,7 +214,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-10"
+      "updatedAt": "2026-09-11"
     },
     {
       "id": "teatro-colon",
@@ -216,7 +225,6 @@ globalThis.__QEA_PLACES__ = {
       "description": "Teatro de ópera de estilo neoclásico inaugurado en 1892, obra del arquitecto italiano Pietro Cantini, sobre la calle 10 del centro histórico. Es la sala patrimonial más importante del país.",
       "whyItMatters": "Sede de las temporadas nacionales de ópera, danza y música sinfónica, y escenario de actos oficiales de Estado. Concentra buena parte de la memoria escénica del país.",
       "lookCloser": "El telón de boca, pintado por Annibale Gatti, es una alegoría teatral. En el plafón del techo hay medallones con Calderón de la Barca, Shakespeare, Molière y otros dramaturgos.",
-      "historicalContext": "Se levantó sobre el antiguo Teatro Maldonado (1792) y se inauguró para el cuarto centenario del viaje de Cristóbal Colón, de donde viene su nombre.",
       "curiosity": "Tiene capacidad para unas 900 personas y su acústica es considerada una de las mejores de América Latina.",
       "latitude": 4.59723,
       "longitude": -74.07444,
@@ -226,9 +234,13 @@ globalThis.__QEA_PLACES__ = {
         "Arte",
         "Música"
       ],
-      "categoryIds": [
-        "categoria-4"
-      ],
+      "layers": {
+        "categoria-1": {
+          "text": "Se levantó sobre el antiguo Teatro Maldonado (1792) y se inauguró para el cuarto centenario del viaje de Cristóbal Colón, de donde viene su nombre.",
+          "evidence": [],
+          "sources": []
+        }
+      },
       "images": [
         {
           "src": "public/fotos/teatro-colon.png",
@@ -242,7 +254,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-10"
+      "updatedAt": "2026-09-11"
     },
     {
       "id": "chorro-de-quevedo",
@@ -253,7 +265,6 @@ globalThis.__QEA_PLACES__ = {
       "description": "Pequeña plaza empedrada de La Candelaria, con una capilla y una fuente. Es punto de encuentro de cuenteros, músicos, artesanos y estudiantes, sobre todo al caer la tarde.",
       "whyItMatters": "La tradición sostiene que aquí Gonzalo Jiménez de Quesada fundó Santa Fe el 6 de agosto de 1538, con doce chozas y una misa. Es un lugar simbólico del origen de la ciudad.",
       "lookCloser": "La capilla que se ve hoy es una reconstrucción de 1969. El «chorro» es una fuente que recuerda el antiguo pilar de agua que abastecía al barrio.",
-      "historicalContext": "El nombre viene del fraile agustino Agustín de Quevedo y Zea, propietario del pilar de agua en el siglo XVIII.",
       "curiosity": "Por el callejón del Embudo, junto a la plaza, se vende chicha en totuma: una bebida de maíz fermentado de raíz muisca.",
       "latitude": 4.59662,
       "longitude": -74.0713,
@@ -263,9 +274,13 @@ globalThis.__QEA_PLACES__ = {
         "Fundación",
         "Vida urbana"
       ],
-      "categoryIds": [
-        "categoria-5"
-      ],
+      "layers": {
+        "categoria-1": {
+          "text": "El nombre viene del fraile agustino Agustín de Quevedo y Zea, propietario del pilar de agua en el siglo XVIII.",
+          "evidence": [],
+          "sources": []
+        }
+      },
       "images": [
         {
           "src": "public/fotos/chorro-de-quevedo.png",
@@ -279,7 +294,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-10"
+      "updatedAt": "2026-09-11"
     },
     {
       "id": "academia-colombiana-de-historia",
@@ -290,7 +305,6 @@ globalThis.__QEA_PLACES__ = {
       "description": "Corporación de derecho privado, sin ánimo de lucro y con personería jurídica, dedicada al estudio, la investigación y la divulgación de la historia de Colombia. Su sede en La Candelaria reúne una biblioteca especializada, un archivo documental y las salas donde sesionan sus miembros.",
       "whyItMatters": "Estudia la historia del país desde los tiempos prehispánicos hasta la actualidad, y trabaja junto con otras instituciones en la conservación del patrimonio documental y en la defensa del patrimonio histórico y cultural.",
       "lookCloser": "A diferencia de un museo, la Academia no se recorre de paso: su vida ocurre en la biblioteca, en las sesiones de sus miembros y en las publicaciones que produce. Conviene consultar horarios y condiciones de consulta antes de ir.",
-      "historicalContext": "Fue fundada en 1902 y es una de las corporaciones académicas más antiguas del país. Su biblioteca se organizó hacia 1910, en el marco del centenario de la Independencia, a partir de donaciones de obras de historia americana.",
       "curiosity": "Escribe la historia de Colombia de manera silenciosa y casi invisible: buena parte de lo que hoy se estudia del pasado del país pasó antes por sus sesiones y sus publicaciones.",
       "latitude": 4.598117,
       "longitude": -74.077428,
@@ -300,9 +314,13 @@ globalThis.__QEA_PLACES__ = {
         "Patrimonio",
         "Investigación"
       ],
-      "categoryIds": [
-        "categoria-6"
-      ],
+      "layers": {
+        "categoria-1": {
+          "text": "Fue fundada en 1902 y es una de las corporaciones académicas más antiguas del país. Su biblioteca se organizó hacia 1910, en el marco del centenario de la Independencia, a partir de donaciones de obras de historia americana.",
+          "evidence": [],
+          "sources": []
+        }
+      },
       "images": [
         {
           "src": "public/fotos/academia-colombiana-de-historia.png",
@@ -315,7 +333,7 @@ globalThis.__QEA_PLACES__ = {
       ],
       "status": "published",
       "createdAt": "2026-08-29",
-      "updatedAt": "2026-09-10"
+      "updatedAt": "2026-09-11"
     }
   ]
 };

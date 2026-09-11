@@ -1,10 +1,13 @@
 /**
- * Capa de servicios — categorías y filtrado (sección 5.3 de ARCHITECTURE.md).
+ * Capa de servicios — capas de lectura y filtrado (sección 5.3 de ARCHITECTURE.md).
  *
  * Funciones puras: reciben lugares y categorías, devuelven lugares. Sin DOM y
  * sin estado propio, de modo que el comportamiento del filtro se puede
- * comprobar con `node --test` sin abrir un navegador. Quién está seleccionado
- * en cada momento lo guarda la interfaz, no este módulo.
+ * comprobar con `node --test` sin abrir un navegador.
+ *
+ * Desde el ADR 0006 las siete categorías son **capas de lectura**, y un lugar
+ * pertenece a una capa si y solo si tiene contenido registrado en ella
+ * (`place.layers[id].text`). No hay lista de pertenencia aparte.
  *
  * Depende de: app/namespace.js
  */
@@ -15,28 +18,65 @@
   const QEA = global.QEA;
 
   /**
-   * Categorías a las que pertenece un lugar.
+   * ¿Tiene esta entrada de capa contenido de verdad?
+   * @param {unknown} entry
+   * @returns {boolean}
+   */
+  function hasContent(entry) {
+    if (!entry || typeof entry !== "object") return false;
+    const text = /** @type {any} */ (entry).text;
+    return typeof text === "string" && text.trim().length > 0;
+  }
+
+  /**
+   * Capas en las que un lugar tiene contenido registrado, por id.
    *
-   * Tolera que falte el campo o que venga como texto suelto en vez de arreglo:
-   * los datos los edita el equipo editorial a mano, y una ficha a medio escribir
-   * no debe tumbar el mapa entero.
+   * Lee `layers`, que es la fuente de verdad. Si el documento es anterior al
+   * ADR 0006 y solo trae `categoryIds`, lo usa como respaldo para no romper
+   * datos antiguos. Tolera datos a medio escribir: una ficha incompleta no debe
+   * tumbar el mapa entero.
    *
    * @param {Place} place
    * @returns {string[]}
    */
   function categoryIdsOf(place) {
-    const value = /** @type {any} */ (place).categoryIds;
-    if (Array.isArray(value)) return value.filter((id) => typeof id === "string" && id);
-    if (typeof value === "string" && value) return [value];
+    const layers = /** @type {any} */ (place).layers;
+    if (layers && typeof layers === "object" && !Array.isArray(layers)) {
+      return Object.keys(layers).filter((id) => hasContent(layers[id]));
+    }
+
+    const legacy = /** @type {any} */ (place).categoryIds;
+    if (Array.isArray(legacy)) return legacy.filter((id) => typeof id === "string" && id);
+    if (typeof legacy === "string" && legacy) return [legacy];
     return [];
   }
 
   /**
-   * Filtra lugares por categoría.
+   * Capas registradas de un lugar, ya emparejadas con su categoría y en el
+   * orden del catálogo —no en el del objeto, que depende de cómo se escribió—.
    *
-   * Un conjunto de selección vacío significa «todas», no «ninguna». Es la
-   * lectura que espera cualquiera que abra el menú y no toque nada, y evita
-   * que la aplicación arranque con el mapa en blanco.
+   * @param {Place} place
+   * @param {Category[]} categories
+   * @returns {{ category: Category, layer: PlaceLayer }[]}
+   */
+  function layersOf(place, categories) {
+    const layers = /** @type {any} */ (place).layers || {};
+    const ordered = [...categories].sort((a, b) => a.number - b.number);
+    /** @type {{ category: Category, layer: PlaceLayer }[]} */
+    const result = [];
+    for (const category of ordered) {
+      const entry = layers[category.id];
+      if (hasContent(entry)) result.push({ category, layer: entry });
+    }
+    return result;
+  }
+
+  /**
+   * Filtra lugares por capa.
+   *
+   * Un conjunto de selección vacío significa «todas», no «ninguna». Varias
+   * capas seleccionadas **suman**: se muestra un lugar si tiene contenido en
+   * cualquiera de ellas.
    *
    * @param {Place[]} places
    * @param {string[]} selectedIds
@@ -49,11 +89,11 @@
   }
 
   /**
-   * Cuántos lugares hay en cada categoría, por id.
+   * Cuántos lugares tienen contenido en cada capa, por id.
    *
-   * El menú lo usa para mostrar el número junto a cada nombre y para atenuar
-   * las que están vacías: pulsar un filtro que deja el mapa sin nada es una
-   * frustración fácil de evitar.
+   * Con capas múltiples un mismo lugar suma en varias, así que la suma de los
+   * recuentos puede superar el número de lugares. Es lo correcto: el número
+   * dice cuántos lugares se han leído desde esa capa.
    *
    * @param {Place[]} places
    * @param {Category[]} categories
@@ -82,26 +122,22 @@
   }
 
   /**
-   * Categoría principal de un lugar: la primera que declara. Determina el color
-   * del marcador y el del encabezado de su ficha.
+   * Primera capa registrada del lugar, en orden de catálogo. Da el color del
+   * encabezado de la ficha cuando no hay fotografía.
    *
    * @param {Place} place
    * @param {Category[]} categories
    * @returns {Category|null}
    */
   function primaryCategory(place, categories) {
-    for (const id of categoryIdsOf(place)) {
-      const category = findCategory(categories, id);
-      if (category) return category;
-    }
-    return null;
+    const ordered = [...categories].sort((a, b) => a.number - b.number);
+    const ids = new Set(categoryIdsOf(place));
+    return ordered.find((category) => ids.has(category.id)) || null;
   }
 
   /**
-   * Lugares que no pertenecen a ninguna categoría conocida.
-   *
-   * Con el catálogo cerrado en siete, un predio fuera de todas ellas es un
-   * error de datos: quedaría invisible en cuanto alguien filtre por algo.
+   * Lugares sin ninguna capa conocida registrada: quedarían invisibles en
+   * cuanto alguien filtre por algo.
    *
    * @param {Place[]} places
    * @param {Category[]} categories
@@ -113,7 +149,9 @@
   }
 
   QEA.define("categoryService", {
+    hasContent,
     categoryIdsOf,
+    layersOf,
     filterByCategories,
     countByCategory,
     findCategory,

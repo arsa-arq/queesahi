@@ -2,6 +2,64 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.3.3] — 2026-09-11
+
+### Cambiado
+
+- **Cada lugar registra contenido propio en una, varias o las siete capas de
+  lectura.** Nuevo campo `layers`, cuya clave es el id de la capa y cuyo valor
+  lleva `text` (obligatorio), `evidence` y `sources` (opcionales). Un lugar
+  pertenece a una capa **si y solo si** tiene contenido registrado en ella: no
+  hay lista de pertenencia aparte que pueda desincronizarse. Ver
+  [ADR 0006](docs/adr/0006-capas-de-lectura-con-contenido-propio.md).
+- **El marcador lleva un anillo segmentado**, un tramo del color de cada capa
+  registrada. Con una sola capa es un color sólido, igual que antes; con varias
+  se ve de un vistazo desde qué capas se ha leído el lugar.
+- **La ficha tiene una sección «Capas de lectura»** con cada capa registrada, su
+  pregunta orientadora, su texto y sus evidencias y fuentes propias, más un
+  contador («3 de 7»). Arriba, un acceso por capa salta a su sección. Son
+  botones y no enlaces `#…`: cambiar el hash habría disparado el enrutador de
+  `#/lugar/<slug>` y cerrado la ficha.
+- `schemaVersion` pasa a **3**. Los documentos antiguos con `categoryIds` se
+  siguen leyendo.
+
+### Migración de datos
+
+- El `historicalContext` de los seis lugares pasa íntegro a su capa
+  **Histórica**: respondía sin ambigüedad a su pregunta orientadora.
+- La asignación arbitraria de la 0.3.x (un lugar por categoría, repartida para
+  conservar colores) **se descarta**: no tenía contenido que la sostuviera.
+- Resultado: los seis lugares tienen hoy la capa Histórica y ninguna otra, así
+  que **los seis marcadores son rojos**. No es una regresión; es lo que el
+  contenido registrado permite afirmar. Se irán llenando de color a medida que
+  se registren otras capas.
+
+### Añadido
+
+- `layersOf()` y `hasContent()` en `categoryService`.
+- `npm run validate` comprueba las capas: que existan en el catálogo, que
+  tengan texto, que sus listas no traigan entradas vacías, y que todo lugar
+  publicado tenga al menos una. Avisa de campos obsoletos (`categoryIds`,
+  `historicalContext` suelto) e imprime la cobertura por capa.
+- `tests/unit/layers.test.mjs`: 13 pruebas nuevas (92 en total).
+
+### Corregido
+
+- **Un fallo al encuadrar el mapa podía impedir que la aplicación arrancara.**
+  Leaflet guarda en caché el tamaño del contenedor. Si el mapa se creaba
+  cuando el contenedor medía 0 —pestaña en segundo plano, panel oculto— y
+  después crecía sin que Leaflet se enterase, `flyTo` dividía por ese 0 y
+  lanzaba «Invalid LatLng object: (NaN, NaN)». Como ocurría al abrir un enlace
+  `#/lugar/…` durante el arranque, terminaba en «La aplicación no pudo
+  iniciarse». Reproducido de forma aislada: mapa creado a 0×0, contenedor a
+  400×600, caché todavía a 0×0, `flyTo` → NaN; tras `invalidateSize()`, sin
+  error.
+
+  Ahora cada encuadre refresca la caché antes de ejecutarse, se aplaza si el
+  mapa aún no tiene superficie —y se reintenta cuando la tiene— y nunca puede
+  tumbar la aplicación: encuadrar es cosmético. El fallo es **anterior a esta
+  versión** (existía ya en la 0.3.2 publicada); apareció al verificar esta.
+
 ## [0.3.2] — 2026-09-11
 
 ### Cambiado

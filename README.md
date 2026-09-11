@@ -58,8 +58,9 @@ funciona— está en
   la ficha del lugar más cercano.
 - Fotografía fija en la cabecera de cada ficha: el texto se desliza por debajo
   al desplazarse, y la imagen no se mueve.
-- Siete categorías con filtro en un menú lateral. El color del marcador es el
-  de su categoría, de modo que el mapa se lee agrupado.
+- Siete capas de lectura por lugar —de una a las siete—, cada una con su
+  propio contenido, y un menú lateral para filtrar por ellas. El marcador lleva
+  un anillo con un tramo del color de cada capa registrada.
 - Enlaces compartibles por lugar: `…/#/lugar/plaza-de-bolivar`. El botón
   «atrás» del navegador cierra la ficha.
 - Última posición conocida guardada en `localStorage`, para responder aunque el
@@ -132,20 +133,41 @@ Cada una trae además su eje de Cátedra, su pregunta orientadora, qué estudia 
 qué evidencia produce. Eso es lo que guía la redacción de las fichas:
 [`docs/product/matriz-de-categorias.md`](docs/product/matriz-de-categorias.md).
 
-Cada predio declara a cuál pertenece con `categoryIds`. Es un arreglo, así que
-un predio podrá estar en varias el día que haga falta, sin cambiar el modelo;
-hoy todos tienen una.
+### Un lugar, varias capas
+
+Las categorías no son tipos de lugar excluyentes sino **capas de lectura**: un
+mismo lugar puede registrar contenido en una, en varias o en las siete. Cada
+capa registrada lleva su propio texto, y opcionalmente sus evidencias y fuentes:
+
+```js
+"layers": {
+  "categoria-1": {
+    "text": "Lo que responde a la pregunta orientadora de la capa.",
+    "evidence": ["Línea del tiempo"],
+    "sources": ["Archivo de Bogotá"]
+  },
+  "categoria-3": { "text": "…" }
+}
+```
+
+**Un lugar pertenece a una capa si y solo si tiene contenido registrado en
+ella.** No hay una lista de pertenencia aparte. Ver
+[ADR 0006](docs/adr/0006-capas-de-lectura-con-contenido-propio.md).
+
+En el mapa, el marcador lleva un anillo con un tramo del color de cada capa
+registrada. En la ficha, una sección «Capas de lectura» muestra cada una con su
+pregunta orientadora, y unos accesos arriba permiten saltar a cada capa.
 
 El menú lateral —el botón de la esquina superior izquierda— filtra por
 categoría. La selección es múltiple y suma: marcar dos muestra los predios de
 ambas. Sin nada marcado se ven todos.
 
-**La adscripción de cada predio sigue siendo provisional.** Los nombres ya son
-los definitivos, pero qué predio pertenece a qué categoría se asignó antes de
-conocerlos y no responde a la matriz. Ver
-[`docs/product/contenido-por-verificar.md`](docs/product/contenido-por-verificar.md).
+**Estado actual:** los seis lugares tienen registrada la capa Histórica —su
+contexto histórico, que responde exactamente a esa pregunta— y ninguna otra.
+Por eso los seis marcadores son rojos y las demás capas aparecen vacías en el
+menú. Se irán llenando a medida que el equipo registre contenido.
 
-No confundir `categoryIds` con `tags`: las etiquetas editoriales libres
+No confundir las capas con `tags`: las etiquetas editoriales libres
 —«Historia», «Mirador», «Arqueología»— siguen existiendo y se muestran en la
 ficha, pero no filtran nada.
 
@@ -168,10 +190,10 @@ escribe un color literal.
 Los cinco acentos originales aparecen juntos en la cinta bajo la cabecera y al
 pie del banner de cada ficha.
 
-Desde que existen las categorías, **el color agrupa, no distingue**: dos predios
-de la misma categoría comparten color a propósito. Lo que los diferencia en el
-mapa es el emoji, y `npm run validate` avisa si dos lugares publicados repiten
-el suyo o si dos categorías comparten color.
+Desde que existen las capas, **el color dice desde dónde se ha leído un lugar,
+no qué lugar es**: el anillo del marcador lleva un tramo por capa registrada.
+Lo que distingue un lugar de otro es el emoji, y `npm run validate` avisa si dos
+lugares publicados repiten el suyo o si dos capas comparten color.
 
 ## Añadir un lugar
 

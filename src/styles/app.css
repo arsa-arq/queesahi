@@ -197,21 +197,30 @@ header.topbar .palette-strip {
   box-shadow: 0 0 0 2px rgba(4, 67, 127, 0.35);
 }
 
-/* Marcador de lugar; el acento lo inyecta mapView.js como --pin-color. */
+/* Marcador de lugar (ADR 0006). El anillo es el fondo del marcador —color
+   sólido con una capa, degradado cónico por tramos con varias— y el relleno
+   blanco va dentro. Un `border` no admite degradados; así sí. */
 .poi-pin {
-  display: grid;
-  place-items: center;
   width: 34px;
   height: 34px;
-  font-size: 18px;
-  background: var(--surface);
-  border: 2.5px solid var(--pin-color, var(--brand-blue));
+  padding: 3px;
+  background: var(--ring, var(--brand-blue));
   border-radius: 50% 50% 50% 4px;
   transform: rotate(45deg);
   box-shadow: 0 4px 10px rgba(4, 48, 92, 0.35);
 }
 
-.poi-pin > span {
+.poi-fill {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+  background: var(--surface);
+  border-radius: inherit;
+}
+
+.poi-fill > span {
   transform: rotate(-45deg);
 }
 
@@ -869,6 +878,103 @@ button.cta.busy .spinner {
 }
 
 .sheet .sources strong {
+  color: var(--text);
+}
+
+/* ---------- Capas de lectura en la ficha (ADR 0006) ---------- */
+
+/* Acceso rápido a cada capa registrada, con su color. */
+.chip.layer-jump {
+  border: 0;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--cat-color, var(--brand-blue)) 16%, #fff);
+  color: color-mix(in srgb, var(--cat-color, var(--brand-blue)) 78%, #000);
+}
+
+.chip.layer-jump:focus-visible {
+  outline: 2px solid var(--brand-orange);
+  outline-offset: 1px;
+}
+
+.sheet .layers {
+  margin: 8px 0 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.sheet .layers-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 0.74rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.sheet .layers-count {
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-soft);
+}
+
+/* Cada capa lleva un filete de su color a la izquierda: se reconoce de qué
+   capa es el texto sin tener que leer el título. */
+.sheet .layer-block {
+  margin: 0 0 16px;
+  padding: 2px 0 2px 12px;
+  border-left: 3px solid var(--cat-color, var(--brand-blue));
+  /* Sin esto, el acceso rápido dejaría la sección debajo de la foto fija. */
+  scroll-margin-top: calc(var(--header-h) + 12px);
+}
+
+.sheet .layer-block h4 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  margin: 0 0 4px;
+}
+
+.sheet .layer-name {
+  font-size: 0.92rem;
+  color: color-mix(in srgb, var(--cat-color, var(--brand-blue)) 80%, #000);
+}
+
+.sheet .layer-sub {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+.sheet .layer-question {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--text-soft);
+}
+
+.sheet .layer-text {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.sheet .layer-meta {
+  margin: 6px 0 0;
+  font-size: 0.74rem;
+  color: var(--text-soft);
+}
+
+.sheet .layer-meta strong {
   color: var(--text);
 }
 

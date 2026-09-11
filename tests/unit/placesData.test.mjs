@@ -82,10 +82,12 @@ test("cada predio tiene un color resoluble a partir de su categoría", () => {
   }
 });
 
-test("los recuentos por categoría suman el total de predios categorizados", () => {
+test("los recuentos por capa cubren todos los lugares", () => {
+  // Con capas múltiples un lugar suma en varias, así que la suma puede superar
+  // el número de lugares; lo que no puede es quedar por debajo.
   const counts = countByCategory(places, categories);
   const suma = Object.values(counts).reduce((a, b) => a + b, 0);
-  assert.equal(suma, places.length);
+  assert.ok(suma >= places.length, `suma ${suma} < ${places.length} lugares`);
 });
 
 test("las coordenadas caen dentro de Bogotá", () => {

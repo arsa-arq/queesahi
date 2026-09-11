@@ -102,27 +102,39 @@ orientadora** dice qué buscar, **qué estudia** delimita el alcance y la
 
 ---
 
-## Una categoría por predio, o varias
+## Cómo registrar una capa en un lugar
 
-El modelo ya admite las dos formas: `categoryIds` es un arreglo. Hoy cada predio
-declara una sola, y conviene decidir cuál de las dos lecturas se quiere:
+Decidido el 2026-09-11: **cada lugar registra contenido en una, varias o las
+siete capas** (ver [ADR 0006](../adr/0006-capas-de-lectura-con-contenido-propio.md)).
 
-**Una capa principal por predio.** El mapa queda legible —cada color agrupa un
-conjunto claro— y el filtro reparte los predios sin solaparlos. A cambio, obliga
-a elegir una entre varias lecturas igual de válidas.
+En `public/data/places.js`, dentro del lugar:
 
-**Varias capas por predio.** Es más fiel a la matriz: la Plaza de Bolívar se
-puede leer desde la histórica, la institucional y la poblacional a la vez. A
-cambio, el color del marcador pasa a ser el de la primera capa declarada, que es
-una decisión arbitraria, y al filtrar un mismo predio aparece en varias
-categorías.
+```js
+"layers": {
+  "categoria-2": {
+    "text": "Responde a la pregunta orientadora de la capa Institucional.",
+    "evidence": ["Ficha institucional", "Función pública del lugar"],
+    "sources": ["Concejo de Bogotá"]
+  }
+}
+```
 
-La segunda opción no exige tocar el código: basta añadir ids a `categoryIds`. Si
-se elige, conviene revisar qué significa entonces el color del marcador.
+- **`text`** es obligatorio y responde a la *pregunta orientadora* de la capa.
+- **`evidence`** es opcional: los productos de la columna «Evidencia o
+  producto» que se hayan elaborado.
+- **`sources`** es opcional: las fuentes que sostienen *esta* lectura. Las
+  generales del lugar siguen en su campo `sources`.
+- La clave es el id de la capa: `categoria-1` Histórica … `categoria-7` Capa
+  inusual.
 
-## Estado de la clasificación
+Un lugar pertenece a una capa **solo si tiene texto en ella**. Si todavía no hay
+nada que decir desde una capa, no se pone: una capa vacía no cuenta y el
+validador la rechaza.
 
-La adscripción actual **es provisional y no responde a la matriz**: se repartió
-un predio por categoría, de la 1 a la 6, conservando el color que cada lugar
-tenía antes de que existieran las categorías. Ver
-[`contenido-por-verificar.md`](contenido-por-verificar.md).
+## Estado del registro
+
+Los seis lugares tienen registrada la capa **Histórica**: su antiguo campo de
+contexto histórico, que responde sin ambigüedad a su pregunta. Ninguno tiene
+todavía las otras seis. El resto del texto de cada ficha —descripción, por qué
+importa, míralo de cerca, curiosidad— sigue como presentación general del lugar;
+parte de él podría redistribuirse entre capas, y eso es trabajo editorial.

@@ -21,10 +21,12 @@ import { dirname, resolve } from "node:path";
 import "../src/app/namespace.js";
 import "../src/types/place.js";
 import "../src/utils/html.js";
+import "../src/services/categoryService.js";
 import "../public/data/places.js";
 
 const { PLACE_STATUSES } = globalThis.QEA.types;
 const { isHexColor, normalizeImage } = globalThis.QEA.html;
+const { categoryIdsOf } = globalThis.QEA.categoryService;
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -83,43 +85,84 @@ const warn = (message) => warnings.push(message);
 const isNonEmptyString = (value) => typeof value === "string" && value.trim().length > 0;
 
 /**
- * Comprueba la adscripción de un predio a la taxonomía de siete categorías.
+ * Comprueba las capas de lectura registradas en un lugar (ADR 0006).
  *
- * Un predio fuera del catálogo desaparecería del mapa en cuanto alguien use el
- * menú lateral, y el fallo se notaría tarde y mal.
+ * Un lugar pertenece a una capa si y solo si tiene contenido en ella, así que
+ * aquí se vigila justo eso: que cada capa exista en el catálogo, que diga algo,
+ * y que un lugar publicado tenga al menos una.
  *
  * @param {Record<string, unknown>} place
  * @param {string} label
  * @param {Set<string>} idsValidos
  */
-function validateCategoryIds(place, label, idsValidos) {
-  const ids = place.categoryIds;
-
-  if (!Array.isArray(ids)) {
-    fail(`${label}: «categoryIds» debe ser un arreglo con al menos una categoría.`);
-    return;
-  }
-
-  if (ids.length === 0) {
-    fail(
-      `${label}: no pertenece a ninguna categoría. Todo predio debe estar en ` +
-        `una de las ${NUMERO_DE_CATEGORIAS}.`
+function validateLayers(place, label, idsValidos) {
+  if (place.categoryIds !== undefined) {
+    warn(
+      `${label}: «categoryIds» está obsoleto desde el ADR 0006 y se ignora ` +
+        `cuando hay «layers». La pertenencia a una capa la da su contenido.`
     );
+  }
+
+  if (isNonEmptyString(place.historicalContext)) {
+    warn(
+      `${label}: «historicalContext» ya no se muestra. Su contenido va en la ` +
+        `capa Histórica: layers["categoria-1"].text.`
+    );
+  }
+
+  const layers = place.layers;
+  if (layers === undefined) {
+    if (place.status === "published") {
+      fail(
+        `${label}: no tiene «layers». Todo lugar publicado registra contenido ` +
+          `en al menos una de las siete capas.`
+      );
+    }
     return;
   }
 
-  for (const id of ids) {
-    if (!isNonEmptyString(id)) {
-      fail(`${label}: «categoryIds» contiene una entrada vacía.`);
+  if (!layers || typeof layers !== "object" || Array.isArray(layers)) {
+    fail(`${label}: «layers» debe ser un objeto cuyas claves son ids de capa.`);
+    return;
+  }
+
+  for (const [id, entry] of Object.entries(layers)) {
+    const capa = `${label}, capa «${id}»`;
+
+    if (idsValidos && !idsValidos.has(id)) {
+      fail(`${capa}: no existe en el catálogo de categorías.`);
       continue;
     }
-    if (idsValidos && !idsValidos.has(String(id))) {
-      fail(`${label}: la categoría «${id}» no existe en el catálogo.`);
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      fail(`${capa}: debe ser un objeto con al menos «text».`);
+      continue;
+    }
+
+    const registro = /** @type {Record<string, unknown>} */ (entry);
+    if (!isNonEmptyString(registro.text)) {
+      fail(
+        `${capa}: falta «text». Una capa sin texto no cuenta como registrada; ` +
+          `si aún no hay nada que decir desde ella, quítala.`
+      );
+    }
+
+    for (const campo of ["evidence", "sources"]) {
+      const valor = registro[campo];
+      if (valor === undefined) continue;
+      if (!Array.isArray(valor)) {
+        fail(`${capa}: «${campo}» debe ser una lista.`);
+      } else if (valor.some((item) => !isNonEmptyString(item))) {
+        fail(`${capa}: «${campo}» contiene entradas vacías.`);
+      }
     }
   }
 
-  if (new Set(ids).size !== ids.length) {
-    warn(`${label}: «categoryIds» repite alguna categoría.`);
+  const registradas = categoryIdsOf(/** @type {any} */ (place)).filter((id) => idsValidos.has(id));
+  if (place.status === "published" && registradas.length === 0) {
+    fail(
+      `${label}: no tiene contenido en ninguna capa. Un lugar publicado debe ` +
+        `registrar al menos una.`
+    );
   }
 }
 
@@ -280,7 +323,7 @@ function validatePlace(place, index, idsValidos) {
     fail(`${label}: un lugar publicado debe citar al menos una fuente.`);
   }
 
-  validateCategoryIds(place, label, idsValidos);
+  validateLayers(place, label, idsValidos);
   validateImages(place, label);
 
   if (place.color !== undefined) {
@@ -467,16 +510,15 @@ function main() {
   places.forEach((place, index) => validatePlace(place, index, idsValidos));
   validateCollection(places);
 
-  // Un predio sin categoría válida es invisible en cuanto se filtre.
-  const sinCategoria = places.filter(
-    (p) => !Array.isArray(p.categoryIds) || !p.categoryIds.some((id) => idsValidos.has(String(id)))
-  );
-  if (sinCategoria.length > 0) {
-    fail(
-      `${sinCategoria.length} predios no pertenecen a ninguna categoría válida: ` +
-        sinCategoria.map((p) => p.id).join(", ")
-    );
-  }
+  // Cobertura por capa: cuántos lugares se han leído desde cada una. No es un
+  // error que una esté vacía, pero conviene verlo en cada validación.
+  const cobertura = categories
+    .map((c) => {
+      const n = places.filter((p) => categoryIdsOf(p).includes(String(c.id))).length;
+      return `${c.name} ${n}`;
+    })
+    .join(" · ");
+  console.log(`  capas  ${cobertura}`);
 
   for (const message of warnings) console.warn(`  aviso  ${message}`);
   for (const message of errors) console.error(`  ERROR  ${message}`);
