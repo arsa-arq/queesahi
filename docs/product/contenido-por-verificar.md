@@ -37,23 +37,30 @@ El catálogo de `public/data/places.js` está creado y funcionando, pero **su
 contenido es provisional en dos frentes**, ambos a la espera de que el equipo de
 la Cátedra los confirme:
 
-**Los nombres.** Se llaman «Categoría 1» … «Categoría 7». Cambiarlos es editar
-el campo `name` de cada entrada; ningún otro archivo depende de esos textos.
-`npm run validate` avisa mientras conserven el nombre provisional.
+**Los nombres: resueltos.** Desde el 2026-09-11 son los de la matriz de la
+Cátedra —Histórica, Institucional, Poblacional, Territorial, Bienestar,
+Civilidad y Capa inusual—, con su capa de ciudad, eje, pregunta orientadora,
+qué estudia y evidencia. Ver
+[`matriz-de-categorias.md`](matriz-de-categorias.md).
 
-**La adscripción de cada predio.** La asignación actual es arbitraria: se
+**La adscripción de cada predio: pendiente.** La asignación actual es arbitraria: se
 repartió un predio por categoría, de la 1 a la 6, conservando el color que cada
 lugar ya tenía para que el mapa no cambiara de aspecto. **No responde a ningún
 criterio temático.** La categoría 7 quedó vacía a propósito.
 
-| Predio | Categoría asignada | Criterio |
+Ahora que las categorías tienen nombre, la arbitrariedad se nota:
+
+| Predio | Quedó en | ¿Tiene sentido? |
 |---|---|---|
-| Plaza de Bolívar | 1 | Ninguno: conservaba el rojo ladrillo |
-| Museo del Oro | 2 | Ninguno: conservaba el naranja |
-| Cerro de Monserrate | 3 | Ninguno: conservaba el verde |
-| Teatro Colón | 4 | Ninguno: conservaba el índigo |
-| Chorro de Quevedo | 5 | Ninguno: conservaba el teal |
-| Academia Colombiana de Historia | 6 | Ninguno: conservaba el azul |
+| Plaza de Bolívar | 1. Histórica | Plausible, por casualidad |
+| Museo del Oro | 2. Institucional | Dudoso: es una institución, pero se lee mejor desde lo histórico o lo poblacional |
+| Cerro de Monserrate | 3. Poblacional | Dudoso |
+| Teatro Colón | 4. Territorial | Poco defendible |
+| Chorro de Quevedo | 5. Bienestar | Dudoso |
+| Academia Colombiana de Historia | 6. Civilidad | Dudoso |
+
+Reasignarlos exige criterio editorial, no técnico: hay que decidir desde qué
+capa se quiere que cada predio se lea.
 
 **El color de la categoría 7** (`#6F4A7F`, ciruela) tampoco viene del PDF de
 marca: la paleta original define cinco acentos más dos azules, y hacía falta un

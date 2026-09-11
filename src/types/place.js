@@ -54,11 +54,21 @@
  * que exista una sola definición de qué categorías hay, en qué orden y de qué
  * color. El color es lo que hace legible el mapa al filtrar.
  *
+ * Los campos `layer`, `axis`, `question`, `studies` y `evidence` vienen de la
+ * matriz de la Cátedra (`docs/product/matriz-de-categorias.md`). No se muestran
+ * todos: guían al equipo editorial sobre qué debe contener la ficha de un
+ * predio leído desde esta capa.
+ *
  * @typedef {Object} Category
- * @property {string} id      Identificador estable, `categoria-1` … `categoria-7`.
- * @property {number} number  Orden de presentación, 1 a 7.
- * @property {string} name    Nombre visible.
- * @property {string} color   Acento `#RRGGBB`, aplicado al marcador y a la ficha.
+ * @property {string} id        Identificador estable, `categoria-1` … `categoria-7`.
+ * @property {number} number    Orden de presentación, 1 a 7.
+ * @property {string} name      Nombre visible.
+ * @property {string} color     Acento `#RRGGBB`, aplicado al marcador y a la ficha.
+ * @property {string} [layer]   Capa de ciudad. Subtítulo en el menú lateral.
+ * @property {string} [axis]    Eje de Cátedra Bogotá al que responde.
+ * @property {string} [question] Pregunta orientadora para leer un predio.
+ * @property {string} [studies] Qué estudia esta capa.
+ * @property {string} [evidence] Evidencia o producto esperado.
  */
 
 /**

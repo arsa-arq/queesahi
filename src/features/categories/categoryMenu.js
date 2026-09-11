@@ -105,10 +105,20 @@
         button.style.setProperty("--cat-color", category.color);
         if (count === 0) button.classList.add("empty");
 
+        // La capa de ciudad acompaña al nombre: «Histórica» sola dice poco,
+        // «Histórico-memorial» explica desde dónde se lee el predio.
+        const layer = category.layer
+          ? `<span class="layer">${escapeHtml(category.layer)}</span>`
+          : "";
+
         button.innerHTML =
           `<span class="swatch" aria-hidden="true"></span>` +
-          `<span class="name">${escapeHtml(category.name)}</span>` +
+          `<span class="label"><span class="name">${escapeHtml(category.name)}</span>${layer}</span>` +
           `<span class="count" aria-hidden="true">${count}</span>`;
+
+        // La pregunta orientadora, al pasar el cursor y para lectores de
+        // pantalla: es larga para la fila, pero es lo que explica la capa.
+        if (category.question) button.title = category.question;
 
         // El recuento se repite en texto para lectores de pantalla, porque
         // «3» suelto junto a un nombre no dice qué son tres.

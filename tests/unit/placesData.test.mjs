@@ -130,3 +130,28 @@ test("los archivos de fotografía referenciados existen", async () => {
     assert.ok(existsSync(raiz + image.src), `falta el archivo ${image.src} (${place.id})`);
   }
 });
+
+test("las categorías tienen nombre propio, no el provisional", () => {
+  for (const category of categories) {
+    assert.doesNotMatch(
+      category.name,
+      /^Categor[ií]a \d+$/,
+      `${category.id} conserva el nombre provisional`
+    );
+  }
+});
+
+test("cada categoría trae el contexto de la matriz de la Cátedra", () => {
+  // Sin estos campos la categoría es una etiqueta suelta: nadie sabe desde
+  // dónde leer el predio ni qué debe contener su ficha.
+  // Ver docs/product/matriz-de-categorias.md
+  for (const category of categories) {
+    for (const campo of ["layer", "axis", "question", "studies", "evidence"]) {
+      assert.ok(
+        typeof category[campo] === "string" && category[campo].trim(),
+        `${category.id}: falta «${campo}»`
+      );
+    }
+    assert.match(category.question, /\?/, `${category.id}: «question» debería ser una pregunta`);
+  }
+});

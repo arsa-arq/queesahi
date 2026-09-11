@@ -429,6 +429,22 @@ function validateCategories(categories) {
         `(«Categoría N»). Pendiente de que el equipo confirme los nombres.`
     );
   }
+
+  // Contexto de la matriz de la Cátedra. No es obligatorio para que la
+  // aplicación funcione, pero sin él la categoría es una etiqueta suelta: nadie
+  // sabe desde dónde leer el predio ni qué debe contener su ficha.
+  for (const category of categories) {
+    const label = isNonEmptyString(category.id) ? `«${category.id}»` : "una categoría";
+    const faltan = ["layer", "axis", "question", "studies", "evidence"].filter(
+      (campo) => !isNonEmptyString(category[campo])
+    );
+    if (faltan.length > 0) {
+      warn(
+        `${label}: sin «${faltan.join("», «")}». Ese contexto sale de la matriz ` +
+          `(docs/product/matriz-de-categorias.md).`
+      );
+    }
+  }
 }
 
 function main() {

@@ -2,6 +2,39 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.3.2] — 2026-09-11
+
+### Cambiado
+
+- **Las siete categorías tienen sus nombres definitivos**, tomados de la matriz
+  de la Cátedra (`Matriz_Que es ahi.xlsx`): Histórica, Institucional,
+  Poblacional, Territorial, Bienestar, Civilidad y Capa inusual.
+- Cada categoría guarda además su **capa de ciudad**, su **eje de Cátedra
+  Bogotá**, su **pregunta orientadora**, **qué estudia** y la **evidencia o
+  producto** esperado. Ese contexto es lo que guía la redacción de la ficha de
+  un predio leído desde esa capa.
+- El menú lateral muestra la capa de ciudad bajo cada nombre: «Histórica» sola
+  dice poco, «Histórico-memorial» explica desde dónde se lee el predio. La
+  pregunta orientadora aparece al pasar el cursor.
+- Los identificadores (`categoria-1` … `categoria-7`) **no cambian**: renombrar
+  no desvincula a los predios ya clasificados.
+- Los colores tampoco cambian, así que el mapa se ve igual.
+
+### Añadido
+
+- `docs/product/matriz-de-categorias.md`, con la matriz completa. Es la fuente
+  para escribir fichas: la pregunta dice qué buscar, «qué estudia» delimita el
+  alcance y la evidencia describe el resultado.
+- `npm run validate` avisa si a una categoría le falta el contexto de la matriz,
+  y deja de avisar de nombres provisionales. Dos pruebas nuevas.
+
+### Pendiente
+
+La adscripción de cada predio **sigue sin responder a la matriz**: se asignó
+antes de conocer los nombres. Ahora que las categorías significan algo, la
+arbitrariedad se nota —el Teatro Colón quedó en «Territorial»—. Reasignarlos
+exige criterio editorial. Detalle en `docs/product/contenido-por-verificar.md`.
+
 ## [0.3.1] — 2026-09-10
 
 ### Corregido

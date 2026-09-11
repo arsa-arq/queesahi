@@ -15,49 +15,84 @@
 
 globalThis.__QEA_PLACES__ = {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-10",
+  "updatedAt": "2026-09-11",
   "categories": [
     {
       "id": "categoria-1",
       "number": 1,
-      "name": "Categoría 1",
-      "color": "#C74A2C"
+      "name": "Histórica",
+      "color": "#C74A2C",
+      "layer": "Histórico-memorial",
+      "axis": "¿Cómo conocemos? — Complejidad y civilidad",
+      "question": "¿Qué hechos, memorias, usos anteriores y transformaciones explican este lugar?",
+      "studies": "Reconstruye la trayectoria histórica del predio, fachada, calle, institución o espacio urbano. Integra archivos, imágenes antiguas, relatos, nombres, fechas y cambios de uso.",
+      "evidence": "Línea del tiempo, reseña histórica, fuentes consultadas, comparación antes/ahora y relato de memoria urbana"
     },
     {
       "id": "categoria-2",
       "number": 2,
-      "name": "Categoría 2",
-      "color": "#E0951E"
+      "name": "Institucional",
+      "color": "#E0951E",
+      "layer": "Institucional y normativa",
+      "axis": "¿Cómo nos organizamos? — Marco institucional y participación",
+      "question": "¿Qué institución, poder, norma, decisión pública o función ciudadana se expresa en este lugar?",
+      "studies": "Identifica entidades, funciones públicas, decisiones urbanas, símbolos de poder, normas, administración distrital, justicia, gobierno, participación o vida democrática vinculada al espacio.",
+      "evidence": "Ficha institucional, identificación de entidad o actor, función pública del lugar y lectura de su relación con Bogotá"
     },
     {
       "id": "categoria-3",
       "number": 3,
-      "name": "Categoría 3",
-      "color": "#7C8B4A"
+      "name": "Poblacional",
+      "color": "#7C8B4A",
+      "layer": "Poblacional y de actores sociales",
+      "axis": "¿Cuántos y quiénes somos? — Componente poblacional",
+      "question": "¿Quiénes usan, transitan, habitan, recuerdan, trabajan, disputan o significan este espacio?",
+      "studies": "Reconoce los sujetos que dan vida al lugar: estudiantes, trabajadores, comerciantes, funcionarios, turistas, manifestantes, familias, habitantes, transeúntes y comunidades diversas.",
+      "evidence": "Entrevistas, testimonios, observación de usuarios, voces ciudadanas y caracterización básica de actores"
     },
     {
       "id": "categoria-4",
       "number": 4,
-      "name": "Categoría 4",
-      "color": "#3C5393"
+      "name": "Territorial",
+      "color": "#3C5393",
+      "layer": "Territorial, cartográfica y de uso del suelo",
+      "axis": "¿Dónde habitamos? — Componente territorial",
+      "question": "¿Dónde se ubica este lugar, cómo se relaciona con su entorno y cómo ha cambiado el suelo que ocupa?",
+      "studies": "Analiza ubicación, predio, manzana, calles, carreras, recorridos, accesos, cambios de uso del suelo, relación con la Plaza de Bolívar, mapas antiguos y actuales.",
+      "evidence": "Mapa, croquis, coordenada, comparación cartográfica, fotografía del entorno y ficha territorial"
     },
     {
       "id": "categoria-5",
       "number": 5,
-      "name": "Categoría 5",
-      "color": "#05707F"
+      "name": "Bienestar",
+      "color": "#05707F",
+      "layer": "Bienestar, espacio público y vida cotidiana",
+      "axis": "¿Cómo vivimos? — Infraestructura, bienestar y espacio público",
+      "question": "¿Qué aporta o limita este lugar para la vida colectiva, la convivencia, la movilidad, la permanencia y el cuidado?",
+      "studies": "Estudia accesibilidad, seguridad, permanencia, circulación, encuentro ciudadano, cuidado, deterioro, usos cotidianos, conflictos, convivencia y apropiación del espacio común.",
+      "evidence": "Registro fotográfico, observación de campo, lectura de usos ciudadanos, evidencias de cuidado o deterioro y recomendación pedagógica"
     },
     {
       "id": "categoria-6",
       "number": 6,
-      "name": "Categoría 6",
-      "color": "#04437F"
+      "name": "Civilidad",
+      "color": "#04437F",
+      "layer": "Prospectiva, patrimonial y de civilidad",
+      "axis": "¿Cómo nos proyectamos? — Modelos de ciudad y memoria",
+      "question": "¿Qué debemos conservar, valorar, transformar o cuidar de este lugar para la Bogotá del futuro?",
+      "studies": "Integra la lectura patrimonial, arquitectónica, simbólica y ciudadana del espacio. Permite que los estudiantes formulen compromisos de cuidado y reflexionen sobre el modelo de ciudad que desean construir.",
+      "evidence": "Compromiso ciudadano, mensaje de cuidado, propuesta juvenil, ficha de civilidad"
     },
     {
       "id": "categoria-7",
       "number": 7,
-      "name": "Categoría 7",
-      "color": "#6F4A7F"
+      "name": "Capa inusual",
+      "color": "#6F4A7F",
+      "layer": "Inusual",
+      "axis": "¿Qué define el espacio?",
+      "question": "¿Qué no vemos?, ¿Qué pasa desapercibido a nuestras vistas? ¿Que hemos considerado no importante?",
+      "studies": "Reconoce elementos, que siempre están, pero no tenemos en cuenta, el olor, los diseños, el uso, el ruido,",
+      "evidence": "Registro fotográfico, sonoro, colecciones"
     }
   ],
   "places": [

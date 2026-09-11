@@ -385,7 +385,7 @@ header.topbar .palette-strip {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
   padding: 11px 12px;
   margin-bottom: 4px;
   border: 0;
@@ -440,10 +440,27 @@ header.topbar .palette-strip {
   line-height: 1;
 }
 
-.category-list .name {
+.category-list .label {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.category-list .name {
   font-size: 0.92rem;
+}
+
+/* Capa de ciudad: dice desde dónde se lee el predio. Se corta con puntos
+   suspensivos en vez de partirse, para que todas las filas midan igual. */
+.category-list .layer {
+  font-size: 0.72rem;
+  line-height: 1.25;
+  color: var(--text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .category-list .count {
@@ -460,7 +477,7 @@ header.topbar .palette-strip {
 
 /* Una categoría sin lugares se atenúa, pero sigue siendo pulsable: dice algo
    real —«aquí todavía no hay nada»— y ocultarla mentiría sobre el catálogo. */
-.category-list button.category.empty .name,
+.category-list button.category.empty .label,
 .category-list button.category.empty .count {
   opacity: 0.5;
 }

@@ -118,12 +118,19 @@ el degradado de marca.
 Los predios se clasifican en **siete categorías**. El catálogo vive en
 `public/data/places.js`, junto a los lugares:
 
-```js
-"categories": [
-  { "id": "categoria-1", "number": 1, "name": "Categoría 1", "color": "#C74A2C" },
-  …
-]
-```
+| # | Categoría | Capa de ciudad |
+|---|---|---|
+| 1 | Histórica | Histórico-memorial |
+| 2 | Institucional | Institucional y normativa |
+| 3 | Poblacional | Poblacional y de actores sociales |
+| 4 | Territorial | Territorial, cartográfica y de uso del suelo |
+| 5 | Bienestar | Bienestar, espacio público y vida cotidiana |
+| 6 | Civilidad | Prospectiva, patrimonial y de civilidad |
+| 7 | Capa inusual | Inusual |
+
+Cada una trae además su eje de Cátedra, su pregunta orientadora, qué estudia y
+qué evidencia produce. Eso es lo que guía la redacción de las fichas:
+[`docs/product/matriz-de-categorias.md`](docs/product/matriz-de-categorias.md).
 
 Cada predio declara a cuál pertenece con `categoryIds`. Es un arreglo, así que
 un predio podrá estar en varias el día que haga falta, sin cambiar el modelo;
@@ -133,10 +140,9 @@ El menú lateral —el botón de la esquina superior izquierda— filtra por
 categoría. La selección es múltiple y suma: marcar dos muestra los predios de
 ambas. Sin nada marcado se ven todos.
 
-**Los nombres son provisionales.** Se llaman «Categoría 1» … «Categoría 7» a la
-espera de que el equipo de la Cátedra los confirme, y la adscripción de cada
-predio también. Cambiar un nombre es editar el campo `name` del catálogo; nada
-más depende de él. Ver
+**La adscripción de cada predio sigue siendo provisional.** Los nombres ya son
+los definitivos, pero qué predio pertenece a qué categoría se asignó antes de
+conocerlos y no responde a la matriz. Ver
 [`docs/product/contenido-por-verificar.md`](docs/product/contenido-por-verificar.md).
 
 No confundir `categoryIds` con `tags`: las etiquetas editoriales libres
