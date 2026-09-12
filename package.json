@@ -1,6 +1,6 @@
 {
   "name": "que-es-ahi",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "private": true,
   "type": "module",
   "description": "Exploración urbana geolocalizada del centro histórico de Bogotá.",

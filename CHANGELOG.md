@@ -2,6 +2,28 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.3.4] — 2026-09-12
+
+### Cambiado
+
+- **Logotipo nuevo.** `logo.png` pasa a ser el lockup completo de marca: el pin
+  con el signo de interrogación, las olas de colores y el nombre escrito a mano
+  debajo. PNG con fondo transparente, 276x312.
+- `header.topbar .brand img` gana `object-fit: contain`. La caja del logo es
+  cuadrada (40x40, 48x48 en escritorio) y el logotipo no lo es, así que sin esto
+  el navegador lo estiraba hasta llenarla: `fill` es el valor por defecto.
+- El `alt` del logo menciona el nombre escrito a mano, que antes no estaba en la
+  imagen.
+
+### Pendiente
+
+- `favicon.png` sigue siendo la versión anterior de la marca. Conviene
+  regenerarlo desde el logotipo nuevo.
+- El nombre escrito a mano es blanco, de modo que **desaparece sobre fondos
+  claros**. En la aplicación no se nota, porque la cabecera es azul profundo,
+  pero `apple-touch-icon` y la tarjeta al compartir (`og:image`) sí pueden
+  componerlo sobre blanco.
+
 ## [0.3.3] — 2026-09-11
 
 ### Cambiado

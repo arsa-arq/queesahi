@@ -69,10 +69,15 @@ header.topbar .brand {
   gap: 10px;
 }
 
+/* El logotipo es el lockup completo —pin, olas y el nombre escrito a mano— y
+   no es cuadrado: mide 276x312. `contain` lo encaja dentro de la caja sin
+   deformarlo. Sin esto el navegador aplica `fill`, que es el valor por
+   defecto, y lo estira hasta llenar el cuadrado. */
 header.topbar .brand img {
   width: 40px;
   height: 40px;
   flex: none;
+  object-fit: contain;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
 }
 
